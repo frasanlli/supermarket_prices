@@ -79,33 +79,34 @@ class Mercadona(Mozilla):
 
     #Filtro productos a clicar
     def get_item_list(self, element_bl):
+        lista_filtrada: list[str]=[]
         #comprobamos si la subcategoría tiene filtro o no (diccionario)
         #filtro CLASIFICAR, Nombres no deben coincidir con subtipos
         if self.lista_mercadona[element_bl]["tipo_filtro"]==self.tipo_filtro[0]:
-            list_filtered=self.get_specific_list(element_bl)
+            lista_filtrada=self.get_specific_list(element_bl)
 
         #filtro ELIMINAR, Nombres no deben coincidir con subtipos
         elif self.lista_mercadona[element_bl]["tipo_filtro"]==self.tipo_filtro[1]:
             for filtro in self.lista_mercadona[element_bl]["filtro"]:
-                list_filtered=self.get_negated_list(filtro)
+                lista_filtrada=self.get_negated_list(filtro)
 
         #filtro SELECCIONAR, Nombres solo deben coincidir con subtipos
         elif self.lista_mercadona[element_bl]["tipo_filtro"]==self.tipo_filtro[2]:
             for filtro in self.lista_mercadona[element_bl]["filtro"]:
-                list_filtered=self.get_specific_list(filtro)
+                lista_filtrada=self.get_specific_list(filtro, lista_filtrada)
 
         #sin filtro, entra todo
         else:
-            list_filtered=self.get_complete_list()
+            lista_filtrada=self.get_complete_list()
 
-        self.get_item(element_bl,list_filtered)
+        self.get_item(element_bl,lista_filtrada)
 
 
     #Abro celda de producto
-    def get_item(self, element_bl, list_filtered: list):
+    def get_item(self, element_bl, lista_filtrada: list):
         try:
             n=0
-            for e in list_filtered:
+            for e in lista_filtrada:
                 WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(e))
                 e.click()
                 product_web=self.get_element_by_attribute("div","data-testid","private-product-detail-info")
@@ -151,10 +152,9 @@ class Mercadona(Mozilla):
             print ("ERROR: list not found")
 
     #Obtener listado de productos filtrado
-    def get_specific_list(self, filtro: str):
+    def get_specific_list(self, filtro: str, filtered_list: list[str]=[""]):
         xpath="//button[@class='product-cell__content-link']"
         try:
-            filtered_list=[]
             list_of_elements=self.driver.find_elements(By.XPATH, xpath)
             for e in list_of_elements:
                 product_text=e.text.lower()
