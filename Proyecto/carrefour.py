@@ -11,7 +11,7 @@ class Carrefour(Mozilla):
     def __init__(self):
         super().__init__()
 
-        self.nombre_super: str="Carrefour"
+        self.nombre_super: str="carrefour"
         self.url: str= "https://www.carrefour.es/supermercado"
 
         self.xpath_product_card: str = "//div[@class='plp-food-view__list']"
@@ -30,8 +30,8 @@ class Carrefour(Mozilla):
                                   "https://www.carrefour.es/supermercado/la-despensa/lacteos/cat20011/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/conservas-sopas-y-precocinados/cat20013/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/huevos/cat20021/c"]
-        self.nombre_csv='carrefour'+self.hoy+'.csv'
-        self.nombre_xlsx='carrefour'+self.hoy+'.xlsx'
+        self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.hoy+'.csv'
+        self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.hoy+'.xlsx'
 
     #Abrir página en navegador
     def go_page (self):
@@ -110,7 +110,6 @@ class Carrefour(Mozilla):
                     self.note_item_quantity(precio_cantidad, precio_unitario)
 
             time.sleep(5)
-            self.save_cookies("carrefour")
 
     #Anotar nombre del producto
     def note_item_name(self, selected_text: str):
@@ -161,4 +160,5 @@ if __name__== "__main__":
     df = pd.DataFrame(data)
     df.to_csv(obj_supermercado.nombre_csv)
     df.to_excel(obj_supermercado.nombre_xlsx)
+    obj_supermercado.save_cookies(obj_supermercado.nombre_super)
     print (data)

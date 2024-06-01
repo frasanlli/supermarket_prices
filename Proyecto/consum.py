@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 class Consum(Mozilla):
     def __init__(self):
         super().__init__()
-        self.nombre_super: str="Consum"
+        self.nombre_super: str="consum"
         self.url: str= "https://tienda.consum.es/es#!Home"
 
         self.xpath_product_card: str = ""#"//div[@class='d-flex flex-column flex-grow-1 w-100 widget-prod__body ng-tns-c233-11']"
@@ -22,8 +22,8 @@ class Consum(Mozilla):
                                   "https://tienda.consum.es/es/c/despensa/conservas-aceites-y-condimentos/aceite-vinagre/1526?orderById=11&page=1",
                                   "https://tienda.consum.es/es/c/despensa/arroz-pastas-legumbres/1639?orderById=11&page=1",
                                   "https://tienda.consum.es/es/c/despensa/harina-levadura-pan-rallado/1646?orderById=11&page=1"]
-        self.nombre_csv='consum'+self.hoy+'.csv'
-        self.nombre_xlsx='consum'+self.hoy+'.xlsx'
+        self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.hoy+'.csv'
+        self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.hoy+'.xlsx'
 
     #Abrir página en navegador
     def go_page (self):
@@ -94,7 +94,7 @@ class Consum(Mozilla):
 
                         seleccionado = True
                         print("PRODUCTO "+basic_producto)
-                        self.data["nombre"].append(basic_producto)
+                        self.data["producto"].append(basic_producto)
                         self.note_item_name(nombre)
                         self.data["supermercado"].append(self.nombre_super)
 
@@ -107,7 +107,6 @@ class Consum(Mozilla):
                     self.note_item_quantity(precio_cantidad, precio_unitario)
 
             time.sleep(5)
-            self.save_cookies("consum")
 
     #Anotar nombre del producto
     def note_item_name(self, selected_text: str):
@@ -158,4 +157,6 @@ if __name__== "__main__":
     df = pd.DataFrame(data)
     df.to_csv(obj_supermercado.nombre_csv)
     df.to_excel(obj_supermercado.nombre_xlsx)
+    obj_supermercado.save_cookies(obj_supermercado.nombre_super)
+    obj_supermercado.driver.close()
     print(data)

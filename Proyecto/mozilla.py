@@ -206,14 +206,14 @@ class Mozilla(Cesta):
             pass
 
     def save_cookies(self, fichero: str):
-        Path(f'{fichero}_cookies.json').write_text(
+        Path(f'cookies//{fichero}_cookies.json').write_text(
             json.dumps(self.driver.get_cookies(), indent=2)
         )
 
     #https://heykush.hashnode.dev/add-cookies-in-selenium
     def load_cookies(self, fichero: str):
         try:
-            with open(f'{fichero}_cookies.json', 'r') as f:
+            with open(f'cookies//{fichero}_cookies.json', 'r') as f:
                 cookies = json.load(f) #stoting cookies
                 for cookie in cookies:
                     #set the sameSite attribute to 'Strict' to avoid the error

@@ -15,6 +15,8 @@ class Mercadona(Mozilla):
         self.url: str= "https://tienda.mercadona.es/categories/"
         self.categories=r'category-menu__item'
 
+        self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.hoy+'.csv'
+        self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.hoy+'.xlsx'
 
     #Abrir página en navegador
     def go_page (self):
@@ -209,26 +211,26 @@ class Mercadona(Mozilla):
             self.driver.quit()
 
 if __name__== "__main__":
-    obj_navegador_md=Mercadona()
-    obj_navegador_md.go_page()
-    obj_navegador_md.load_cookies("mercadona")
+    obj_supermercado=Mercadona()
+    obj_supermercado.go_page()
+    obj_supermercado.load_cookies("mercadona")
 
     try:
-        botones_cookies=obj_navegador_md.get_list_elements_by_attribute("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
+        botones_cookies=obj_supermercado.get_list_elements_by_attribute("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
         botones_cookies[0].click()
     except:
         pass
 
     try:
-        obj_navegador_md.fill_input("name", "postalCode", "46019")
-        obj_navegador_md.press_button("data-testid","postal-code-checker-button")
-        obj_navegador_md.wait_dissapear(obj_navegador_md.get_element_by_attribute("div", "class", "modal__click-outside"))
+        obj_supermercado.fill_input("name", "postalCode", "46019")
+        obj_supermercado.press_button("data-testid","postal-code-checker-button")
+        obj_supermercado.wait_dissapear(obj_supermercado.get_element_by_attribute("div", "class", "modal__click-outside"))
     except:
         pass
 
-    data:list = obj_navegador_md.obtain_categories ("li")
+    data:list = obj_supermercado.obtain_categories ("li")
     df=pd.DataFrame(data)
-    df.to_csv('mercadona_'+obj_navegador_md.hoy+'.csv')
-    df.to_excel('mercadona_'+obj_navegador_md.hoy+'.xlsx')
-    obj_navegador_md.save_cookies("mercadona")
-    obj_navegador_md.driver.close()
+    df.to_csv(obj_supermercado.nombre_csv)
+    df.to_excel(obj_supermercado.nombre_xlsx)
+    obj_supermercado.save_cookies(obj_supermercado.nombre_super)
+    obj_supermercado.driver.close()
