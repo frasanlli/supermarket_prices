@@ -21,7 +21,8 @@ class Consum(Mozilla):
                                   "https://tienda.consum.es/es/c/despensa/arroz-pastas-legumbres/pastas/1659?orderById=11&page=1",
                                   "https://tienda.consum.es/es/c/despensa/conservas-aceites-y-condimentos/aceite-vinagre/1526?orderById=11&page=1",
                                   "https://tienda.consum.es/es/c/despensa/arroz-pastas-legumbres/1639?orderById=11&page=1",
-                                  "https://tienda.consum.es/es/c/despensa/harina-levadura-pan-rallado/1646?orderById=11&page=1"]
+                                  "https://tienda.consum.es/es/c/frescos/frutas/2179?orderById=11&page=1",
+                                  "https://tienda.consum.es/es/c/frescos/verduras/2187?orderById=11&page=1"]
         self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.hoy+'.csv'
         self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.hoy+'.xlsx'
 
@@ -58,6 +59,7 @@ class Consum(Mozilla):
             if web_error or web_error_2:
                 self.driver.refresh()
                 self.navegar(url)
+                time.sleep(5)
 
             #self.driver.find_element(By.CLASS_NAME, "grid__order form-control dropdown-toggle a-btn-dropdown u-rounded u-form--hide-icon ng-tns-c312-142 ng-pristine ng-valid ng-touched").click()
             #time.sleep(1)
@@ -83,30 +85,33 @@ class Consum(Mozilla):
         contador: int = -1
         for producto_nombre in elementos_nombre:
             seleccionado: bool = False
+            evitar: bool = False
             nombre: str = producto_nombre.text.lower()
 
             if nombre != "":
                 contador+=1
+                for producto_evitar in self.lista_evitar:
+                    if producto_evitar in nombre:
+                        evitar = True
 
-                #for basic_producto in self.basic_list:
-                for basic_producto in self.lista_todos:
-                    if basic_producto in nombre:
+                if not evitar:
+                    #for basic_producto in self.basic_list:
+                    for basic_producto in self.lista_todos:
+                        if basic_producto in nombre:
+                            seleccionado = True
+                            print("PRODUCTO "+basic_producto)
+                            self.data["producto"].append(basic_producto)
+                            self.note_item_name(nombre)
+                            self.data["supermercado"].append(self.nombre_super)
 
-                        seleccionado = True
-                        print("PRODUCTO "+basic_producto)
-                        self.data["producto"].append(basic_producto)
-                        self.note_item_name(nombre)
-                        self.data["supermercado"].append(self.nombre_super)
+                    if seleccionado:
+                        precio_cantidad: str = lista_precios_cantidad[contador]
+                        self.note_item_stPrice(precio_cantidad)
 
-                if seleccionado:
-                    precio_cantidad: str = lista_precios_cantidad[contador]
-                    self.note_item_stPrice(precio_cantidad)
-
-                    precio_unitario: str = elementos_precio_unitario[contador].text
-                    self.note_item_unitary_prize(precio_unitario)
-                    self.note_item_quantity(precio_cantidad, precio_unitario)
-
-            time.sleep(5)
+                        precio_unitario: str = elementos_precio_unitario[contador].text
+                        self.note_item_unitary_prize(precio_unitario)
+                        self.note_item_quantity(precio_cantidad, precio_unitario)
+        time.sleep(2)
 
     #Anotar nombre del producto
     def note_item_name(self, selected_text: str):
@@ -135,19 +140,21 @@ class Consum(Mozilla):
     #Anotar precio/cantidad_estandar del producto
     def note_item_stPrice(self, product_quantity_prize: str):
         try:
-            quantity_prize_num = float((re.findall("\d+\,\d+",product_quantity_prize)[0]).replace(",","."))
+            point_quantity_prize = product_quantity_prize.replace(",",".")
+            quantity_prize_num = float(re.findall("\d+\.\d+",point_quantity_prize)[0])
         except:
-            print("ERROR al anotar precio/cantiad")
+            quantity_prize_num = float(re.findall("\d",point_quantity_prize)[0])
         print("PRECIO(€/cantidad):"+str(quantity_prize_num))
         self.data["precio por cantidad(€/cantidad)"].append(quantity_prize_num)
 
     #Anotar nombre del producto
     def note_item_unitary_prize(self, unitary_prize: str):
         try:
-            unit_prize_num = float((re.findall("\d+\,\d+",unitary_prize)[0]).replace(",","."))
+            point_unitary_prize = unitary_prize.replace(",",".")
+            unit_prize_num = float((re.findall("\d+\.\d+",point_unitary_prize)[0]))
         except:
-            unit_prize_num = float((re.findall("\d",unitary_prize)[0]).replace(",","."))
-        print("PRECIO UNDIAD(€):"+str(unit_prize_num))
+            unit_prize_num = float((re.findall("\d",point_unitary_prize)[0]))
+        print("PRECIO UNDIDAD(€):"+str(unit_prize_num))
         self.data["precio unitario(€)"].append(unit_prize_num)
 
 

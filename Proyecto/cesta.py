@@ -4,9 +4,12 @@ class Cesta():
     def __init__(self):
         self.hoy = datetime.now().strftime("%d_%m_%y")
         self.tipo_filtro=["clasificar", "eliminar", "seleccionar"]
-        self.lista_todos=["aceite", "garbanzo", "lenteja", "alubia", "carne picada",
-                          "arroz", "leche entera", "manzana", "banana", "pimiento",
-                          "calabacín", "cebolla", "berenjena", "huevos", "mantequilla"]
+        self.lista_todos=["garbanzo", "lenteja", "alubia", "arroz",
+                        "leche entera", "manzana", "banana", "pimiento", "calabacín",
+                        "cebolla", "berenjena", "huevos", "mantequilla", "patata",
+                        "aceite de oliva", "aceite de girasol", "aceite de coco"]
+
+        self.lista_evitar=["monodosis", "vinagre"]
         self.lista_mercadona={"aceite":{
                             "tipo_filtro": self.tipo_filtro[0],
                             "filtro": ["oliva", "girasol", "coco"]
@@ -37,16 +40,12 @@ class Cesta():
                             },
                         "verdura":{
                             "tipo_filtro": self.tipo_filtro[2],
-                            "filtro": ["pimiento", "calabacín", "cebolla", "berenjena"]
+                            "filtro": ["pimiento", "calabacín", "cebolla", "berenjena", "patata"]
                             },
                         "huevos":{
                             "tipo_filtro": "",
                             "filtro": ""
-                            },
-                        "carne picada":{
-                            "tipo_filtro": self.tipo_filtro[0],
-                            "filtro": ["pollo", "ternera"]
-                            },
+                            }
                         }
 
         """queso fresco":{

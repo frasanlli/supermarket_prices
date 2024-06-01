@@ -21,14 +21,14 @@ class Carrefour(Mozilla):
         self.xpath_nombre_producto: str = self.xpath_product_card+"//a[@class='product-card__title-link track-click']"
 
         self.url_list: list[str]=["https://www.carrefour.es/supermercado/productos-frescos/frutas/cat220006/c",
+                                  "https://www.carrefour.es/supermercado/la-despensa/alimentacion/aceites-y-vinagres/cat20066/c",
                                   #"https://www.carrefour.es/supermercado/productos-frescos/carniceria/cat20018/c",
                                   #"https://www.carrefour.es/supermercado/productos-frescos/pescaderia/cat20014/c",
-                                  #"https://www.carrefour.es/supermercado/bebidas/aguas-y-zumos/cat650002/c"
+                                  #"https://www.carrefour.es/supermercado/bebidas/aguas-y-zumos/cat650002/c,"
+                                  "https://www.carrefour.es/supermercado/la-despensa/alimentacion/legumbres/cat20071/c",
                                   "https://www.carrefour.es/supermercado/productos-frescos/verduras-y-hortalizas/cat220014/c",
-                                  "https://www.carrefour.es/supermercado/productos-frescos/panaderia-tradicional/cat20019/c",
                                   "https://www.carrefour.es/supermercado/productos-frescos/quesos/cat20020/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/lacteos/cat20011/c",
-                                  "https://www.carrefour.es/supermercado/la-despensa/conservas-sopas-y-precocinados/cat20013/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/huevos/cat20021/c"]
         self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.hoy+'.csv'
         self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.hoy+'.xlsx'
@@ -67,6 +67,7 @@ class Carrefour(Mozilla):
             if web_error or web_error_2:
                 self.driver.refresh()
                 self.navegar(url)
+                time.sleep(5)
 
             self.press_button("class", "c-button sort-options__button c-button--tone-monochrome c-button--variation-secondary c-button--size-s")
             self.click_script_preciokilo("button", "class", "c-link sort-options__list__item__link c-link--size-m c-link--tone-monochrome")
@@ -87,29 +88,37 @@ class Carrefour(Mozilla):
         contador: int = -1
         for producto_nombre in elementos_nombre:
             seleccionado: bool = False
+            evitar: bool = False
             nombre: str = producto_nombre.text.lower()
 
             if nombre != "":
                 contador+=1
+                for producto_evitar in self.lista_evitar:
+                    if producto_evitar in nombre:
+                        evitar = True
 
-                #for basic_producto in self.basic_list:
-                for basic_producto in self.lista_todos:
-                    if basic_producto in nombre:
-                        seleccionado = True
-                        print("PRODUCTO: "+basic_producto)
-                        self.data["producto"].append(basic_producto)
-                        self.note_item_name(nombre)
-                        self.data["supermercado"].append(self.nombre_super)
+                if not evitar:
 
-                if seleccionado:
-                    precio_cantidad: str = elementos_precio_cantidad[contador].text
-                    self.note_item_stPrice(precio_cantidad)
+                    #for basic_producto in self.basic_list:
+                    for basic_producto in self.lista_todos:
+                        for producto_evitar in self.lista_evitar:
+                            if producto_evitar in nombre:
+                                break
+                        if basic_producto in nombre:
+                            seleccionado = True
+                            print("PRODUCTO: "+basic_producto)
+                            self.data["producto"].append(basic_producto)
+                            self.note_item_name(nombre)
+                            self.data["supermercado"].append(self.nombre_super)
 
-                    precio_unitario: str = lista_precio_unitario[contador]
-                    self.note_item_unitary_prize(precio_unitario)
-                    self.note_item_quantity(precio_cantidad, precio_unitario)
+                    if seleccionado:
+                        precio_cantidad: str = elementos_precio_cantidad[contador].text
+                        self.note_item_stPrice(precio_cantidad)
 
-            time.sleep(5)
+                        precio_unitario: str = lista_precio_unitario[contador]
+                        self.note_item_unitary_prize(precio_unitario)
+                        self.note_item_quantity(precio_cantidad, precio_unitario)
+        time.sleep(2)
 
     #Anotar nombre del producto
     def note_item_name(self, selected_text: str):
@@ -121,14 +130,16 @@ class Carrefour(Mozilla):
     #Anotar cantidad del producto
     def note_item_quantity(self, product_quantity_prize: str, unitary_prize: str):
         try:
-            quantity_prize_num = float((re.findall("\d+\,\d+",product_quantity_prize)[0]).replace(",","."))
+            point_quantity_prize = product_quantity_prize.replace(",",".")
+            quantity_prize_num = float(re.findall("\d+\.\d+",point_quantity_prize)[0])
         except:
-            quantity_prize_num = float((re.findall("\d",product_quantity_prize)[0]).replace(",","."))
+            quantity_prize_num = float(re.findall("\d",point_quantity_prize)[0])
 
         try:
-            unit_prize_num = float((re.findall("\d+\,\d+",unitary_prize)[0]).replace(",","."))
+            point_unitary_prize = unitary_prize.replace(",",".")
+            unit_prize_num = float((re.findall("\d+\.\d+",point_unitary_prize)[0]))
         except:
-            unit_prize_num = float((re.findall("\d",unitary_prize)[0]).replace(",","."))
+            unit_prize_num = float((re.findall("\d",point_unitary_prize)[0]))
 
         cantidad = unit_prize_num/quantity_prize_num
         print("CANTIDAD:"+str("%.2f" % cantidad))
@@ -138,18 +149,20 @@ class Carrefour(Mozilla):
     #Anotar precio/cantidad_estandar del producto
     def note_item_stPrice(self, product_quantity_prize: str):
         try:
-            quantity_prize_num = float((re.findall("\d+\,\d+",product_quantity_prize)[0]).replace(",","."))
+            point_quantity_prize = product_quantity_prize.replace(",",".")
+            quantity_prize_num = float(re.findall("\d+\.\d+",point_quantity_prize)[0])
         except:
-            quantity_prize_num = float((re.findall("\d",product_quantity_prize)[0]).replace(",","."))
+            quantity_prize_num = float(re.findall("\d",point_quantity_prize)[0])
         print("PRECIO(€/cantidad):"+str(quantity_prize_num))
         self.data["precio por cantidad(€/cantidad)"].append(quantity_prize_num)
 
     #Anotar nombre del producto
     def note_item_unitary_prize(self, unitary_prize: str):
         try:
-            unit_prize_num = float((re.findall("\d+\,\d+",unitary_prize)[0]).replace(",","."))
+            point_unitary_prize = unitary_prize.replace(",",".")
+            unit_prize_num = float((re.findall("\d+\.\d+",point_unitary_prize)[0]))
         except:
-            unit_prize_num = float((re.findall("\d",unitary_prize)[0]).replace(",","."))
+            unit_prize_num = float((re.findall("\d",point_unitary_prize)[0]))
         print("PRECIO UNDIAD(€):"+str(unit_prize_num))
         self.data["precio unitario(€)"].append(unit_prize_num)
 

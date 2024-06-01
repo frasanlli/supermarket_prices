@@ -226,9 +226,8 @@ class Mozilla(Cesta):
             pass
 
     def scroll_bottom(self):
-        time.sleep(5)
         self.driver.execute_script("window.scrollTo(100,document.body.scrollHeight);")
-        time.sleep(5)
+        time.sleep(10)
 
     def precio_unitario_carrefour(self, xpath_precio_unitario: str)->list[str]:
         xpath = xpath_precio_unitario+"//span"
