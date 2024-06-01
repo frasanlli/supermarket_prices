@@ -99,6 +99,7 @@ class Carrefour(Mozilla):
                         print("PRODUCTO: "+basic_producto)
                         self.data["producto"].append(basic_producto)
                         self.note_item_name(nombre)
+                        self.data["supermercado"].append(self.nombre_super)
 
                 if seleccionado:
                     precio_cantidad: str = elementos_precio_cantidad[contador].text

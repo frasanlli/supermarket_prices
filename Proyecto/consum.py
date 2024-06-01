@@ -96,6 +96,7 @@ class Consum(Mozilla):
                         print("PRODUCTO "+basic_producto)
                         self.data["nombre"].append(basic_producto)
                         self.note_item_name(nombre)
+                        self.data["supermercado"].append(self.nombre_super)
 
                 if seleccionado:
                     precio_cantidad: str = lista_precios_cantidad[contador]
