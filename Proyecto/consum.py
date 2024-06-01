@@ -94,7 +94,7 @@ class Consum(Mozilla):
 
                         seleccionado = True
                         print("PRODUCTO "+basic_producto)
-                        self.data["nombre"].append(basic_producto)
+                        self.data["producto"].append(basic_producto)
                         self.note_item_name(nombre)
                         self.data["supermercado"].append(self.nombre_super)
 
