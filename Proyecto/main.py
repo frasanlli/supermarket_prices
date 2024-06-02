@@ -68,6 +68,9 @@ class main_class():
         self.mercadona_data()
         self.carrefour_data()
         self.consum_data()
+        self.mercadona_data()
+        self.carrefour_data()
+        self.consum_data()
 
         self.reducir_datos()
         self.csv_a_json()
