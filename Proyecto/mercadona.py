@@ -211,23 +211,23 @@ class Mercadona(Mozilla):
             self.driver.quit()
 
     def main(self) ->list:
-        obj_supermercado.go_page()
-        obj_supermercado.load_cookies(obj_supermercado.nombre_super)
+        self.go_page()
+        self.load_cookies(self.nombre_super)
 
         try:
-            botones_cookies=obj_supermercado.get_list_elements_by_attribute("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
+            botones_cookies=self.get_list_elements_by_attribute("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
             botones_cookies[0].click()
         except:
             pass
 
         try:
-            obj_supermercado.fill_input("name", "postalCode", "46019")
-            obj_supermercado.press_button("data-testid","postal-code-checker-button")
-            obj_supermercado.wait_dissapear(obj_supermercado.get_element_by_attribute("div", "class", "modal__click-outside"))
+            self.fill_input("name", "postalCode", "46019")
+            self.press_button("data-testid","postal-code-checker-button")
+            self.wait_dissapear(self.get_element_by_attribute("div", "class", "modal__click-outside"))
         except:
             pass
 
-        data:list = obj_supermercado.obtain_categories ("li")
+        data:list = self.obtain_categories ("li")
         return data
 
 

@@ -9,7 +9,7 @@ class main_class():
         self.hoy = datetime.now().strftime("%d_%m_%y")
 
 
-    def procesar_datos(datos: list, obj_supermercado):
+    def procesar_datos(self, datos: list, obj_supermercado):
         df = pd.DataFrame(datos)
         df.to_csv(obj_supermercado.nombre_csv)
         df.to_excel(obj_supermercado.nombre_xlsx)
@@ -65,8 +65,8 @@ class main_class():
 
     #MAIN
     def main(self):
-        self.mercadona_data()
-        self.carrefour_data()
+        #self.mercadona_data()
+        #self.carrefour_data()
         self.consum_data()
 
         self.reducir_datos()

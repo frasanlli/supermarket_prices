@@ -7,12 +7,12 @@ class Cesta():
         self.lista_todos=["garbanzo", "lenteja", "alubia", "arroz", "harina de trigo",
                         "leche entera", "manzana", "banana", "pimiento", "tomate",
                         "cebolla", "berenjena", "huevos", "mantequilla", "patata",
-                        "aceite de oliva", "aceite de girasol", "aceite de coco"]
+                        "aceite de oliva", "aceite de girasol"]
 
         self.lista_evitar=["monodosis", "vinagre"]
         self.lista_mercadona={"aceite":{
-                            "tipo_filtro": self.tipo_filtro[0],
-                            "filtro": ["oliva", "girasol", "coco"]
+                            "tipo_filtro": self.tipo_filtro[2],
+                            "filtro": ["aceite de oliva", "aceite de girasol"]
                             },
                             "mantequilla":{
                             "tipo_filtro": self.tipo_filtro[2],
@@ -40,7 +40,7 @@ class Cesta():
                             },
                         "verdura":{
                             "tipo_filtro": self.tipo_filtro[2],
-                            "filtro": ["pimiento", "calabacín", "cebolla", "berenjena", "patata"]
+                            "filtro": ["pimiento", "cebolla", "berenjena", "patata"]
                             },
                         "huevos":{
                             "tipo_filtro": "",

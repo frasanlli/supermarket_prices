@@ -21,11 +21,14 @@ class Carrefour(Mozilla):
         self.xpath_nombre_producto: str = self.xpath_product_card+"//a[@class='product-card__title-link track-click']"
 
         self.url_list: list[str]=["https://www.carrefour.es/supermercado/productos-frescos/frutas/cat220006/c",
+                                  "https://www.carrefour.es/supermercado/productos-frescos/frutas/manzanas-y-peras/cat220010/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/alimentacion/aceites-y-vinagres/cat20066/c",
+                                  "https://www.carrefour.es/supermercado/la-despensa/alimentacion/aceites-y-vinagres/cat20066/c?sort=active_price_pum%20asc&offset=24",
                                   "https://www.carrefour.es/supermercado/la-despensa/alimentacion/arroz-y-cous-cous/cat20068/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/alimentacion/harinas-y-levaduras/cat20070/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/alimentacion/legumbres/cat20071/c",
                                   "https://www.carrefour.es/supermercado/productos-frescos/verduras-y-hortalizas/cat220014/c",
+                                  "https://www.carrefour.es/supermercado/productos-frescos/verduras-y-hortalizas/hortalizas/cat220019/c",
                                   "https://www.carrefour.es/supermercado/productos-frescos/quesos/cat20020/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/lacteos/cat20011/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/huevos/cat20021/c"]
@@ -50,7 +53,7 @@ class Carrefour(Mozilla):
 
     def main(self)->list:
         self.go_page()
-        obj_supermercado.load_cookies(obj_supermercado.nombre_super)
+        self.load_cookies(self.nombre_super)
 
         try:
             self.press_button("id", "onetrust-reject-all-handler")
