@@ -8,46 +8,33 @@ class main_class():
     def __init__(self) -> None:
         self.hoy = datetime.now().strftime("%d_%m_%y")
 
+
+    def procesar_datos(datos: list, obj_supermercado):
+        df = pd.DataFrame(datos)
+        df.to_csv(obj_supermercado.nombre_csv)
+        df.to_excel(obj_supermercado.nombre_xlsx)
+
+
     def consum_data(self):
-        obj_supermercado_cs=Consum()
-        data= obj_supermercado_cs.main()
-        df = pd.DataFrame(data)
-        df.to_csv(obj_supermercado_cs.nombre_csv)
-        df.to_excel(obj_supermercado_cs.nombre_xlsx)
-        obj_supermercado_cs.driver.close()
+        obj_supermercado=Consum()
+        datos_brutos= obj_supermercado.main()
+        self.procesar_datos(datos_brutos, obj_supermercado)
+        obj_supermercado.driver.close()
+
 
     def carrefour_data(self):
-        obj_supermercado_cr=Carrefour()
+        obj_supermercado=Carrefour()
+        datos_brutos= obj_supermercado.main()
+        self.procesar_datos(datos_brutos, obj_supermercado)
+        obj_supermercado.driver.close()
 
-        data = obj_supermercado_cr.main()
-        df = pd.DataFrame(data)
-        df.to_csv(obj_supermercado_cr.nombre_csv)
-        df.to_excel(obj_supermercado_cr.nombre_xlsx)
-        obj_supermercado_cr.driver.close()
 
     def mercadona_data(self):
-        obj_supermercado_md=Mercadona()
-        obj_supermercado_md.go_page()
-        obj_supermercado_md.load_cookies("mercadona")
+        obj_supermercado=Mercadona()
+        datos_brutos= obj_supermercado.main()
+        self.procesar_datos(datos_brutos, obj_supermercado)
+        obj_supermercado.driver.close()
 
-        try:
-            botones_cookies=obj_supermercado_md.get_list_elements_by_attribute("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
-            botones_cookies[0].click()
-        except:
-            pass
-        try:
-            obj_supermercado_md.fill_input("name", "postalCode", "46019")
-            obj_supermercado_md.press_button("data-testid","postal-code-checker-button")
-            obj_supermercado_md.wait_dissapear(obj_supermercado_md.get_element_by_attribute("div", "class", "modal__click-outside"))
-        except:
-            pass
-
-        data:list = obj_supermercado_md.obtain_categories ("li")
-        df=pd.DataFrame(data)
-        df.to_csv('mercadona_'+self.hoy+'.csv')
-        df.to_excel('mercadona_'+self.hoy+'.xlsx')
-        obj_supermercado_md.save_cookies("mercadona")
-        obj_supermercado_md.driver.close()
 
     def reducir_datos(self):
         df_total = []
@@ -56,6 +43,8 @@ class main_class():
         for supermercado in supermercados:
             df=pd.DataFrame(pd.read_csv(f"datos_csv//{supermercado}_{self.hoy}.csv", index_col=0))
             df_ordenar_precio = df.sort_values(by=['precio por cantidad(€/cantidad)'])
+
+            print(df_ordenar_precio)
 
             filtro_productos: list[str] = df_ordenar_precio.drop_duplicates(subset=["producto"])
             df_total.append(filtro_productos)
@@ -66,17 +55,22 @@ class main_class():
         print(df_final)
         df_final.to_csv('datos_csv//supermercados_'+self.hoy+'.csv')
         df_final.to_excel('datos_excel//supermercados_'+self.hoy+'.xlsx')
-        #df.to_csv('supermercados.csv')
+        self.csv_a_json()
+
+
+    def csv_a_json(self):
+        df=pd.DataFrame(pd.read_csv(f"datos_csv//supermercados_{self.hoy}.csv", index_col=0))
+        df.to_json("supermercados.json")
 
 
     #MAIN
     def main(self):
-        #self.mercadona_data()
-        #self.carrefour_data()
-        #self.consum_data()
+        self.mercadona_data()
+        self.carrefour_data()
+        self.consum_data()
 
         self.reducir_datos()
-
+        self.csv_a_json()
 
 if __name__== "__main__":
     obj_main = main_class()

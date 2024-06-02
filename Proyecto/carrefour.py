@@ -22,9 +22,8 @@ class Carrefour(Mozilla):
 
         self.url_list: list[str]=["https://www.carrefour.es/supermercado/productos-frescos/frutas/cat220006/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/alimentacion/aceites-y-vinagres/cat20066/c",
-                                  #"https://www.carrefour.es/supermercado/productos-frescos/carniceria/cat20018/c",
-                                  #"https://www.carrefour.es/supermercado/productos-frescos/pescaderia/cat20014/c",
-                                  #"https://www.carrefour.es/supermercado/bebidas/aguas-y-zumos/cat650002/c,"
+                                  "https://www.carrefour.es/supermercado/la-despensa/alimentacion/arroz-y-cous-cous/cat20068/c",
+                                  "https://www.carrefour.es/supermercado/la-despensa/alimentacion/harinas-y-levaduras/cat20070/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/alimentacion/legumbres/cat20071/c",
                                   "https://www.carrefour.es/supermercado/productos-frescos/verduras-y-hortalizas/cat220014/c",
                                   "https://www.carrefour.es/supermercado/productos-frescos/quesos/cat20020/c",
@@ -51,7 +50,7 @@ class Carrefour(Mozilla):
 
     def main(self)->list:
         self.go_page()
-        self.load_cookies("carrefour")
+        obj_supermercado.load_cookies(obj_supermercado.nombre_super)
 
         try:
             self.press_button("id", "onetrust-reject-all-handler")

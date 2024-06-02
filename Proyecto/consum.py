@@ -20,9 +20,11 @@ class Consum(Mozilla):
                                   "https://tienda.consum.es/es/c/despensa/lacteos-huevos/huevos/2065?orderById=11&page=1",
                                   "https://tienda.consum.es/es/c/despensa/arroz-pastas-legumbres/pastas/1659?orderById=11&page=1",
                                   "https://tienda.consum.es/es/c/despensa/conservas-aceites-y-condimentos/aceite-vinagre/1526?orderById=11&page=1",
-                                  "https://tienda.consum.es/es/c/despensa/arroz-pastas-legumbres/1639?orderById=11&page=1",
+                                  "https://tienda.consum.es/es/c/despensa/arroz-pastas-legumbres/arroz/1640?orderById=11&page=1",
                                   "https://tienda.consum.es/es/c/frescos/frutas/2179?orderById=11&page=1",
-                                  "https://tienda.consum.es/es/c/frescos/verduras/2187?orderById=11&page=1"]
+                                  "https://tienda.consum.es/es/c/frescos/verduras/2187?orderById=11&page=1",
+                                  "https://tienda.consum.es/es/c/despensa/arroz-pastas-legumbres/legumbres-secas/1649?orderById=11&page=1",
+                                  "https://tienda.consum.es/es/c/despensa/harina-levadura-pan-rallado/1646?orderById=11&page=1"]
         self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.hoy+'.csv'
         self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.hoy+'.xlsx'
 
@@ -44,7 +46,7 @@ class Consum(Mozilla):
 
     def main(self)->list:
         self.go_page()
-        self.load_cookies("consum")
+        self.load_cookies(obj_supermercado.nombre_super)
 
         try:
             self.press_button("id", "onetrust-reject-all-handler")

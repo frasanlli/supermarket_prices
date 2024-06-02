@@ -206,9 +206,12 @@ class Mozilla(Cesta):
             pass
 
     def save_cookies(self, fichero: str):
-        Path(f'cookies//{fichero}_cookies.json').write_text(
-            json.dumps(self.driver.get_cookies(), indent=2)
-        )
+        try:
+            Path(f'cookies//{fichero}_cookies.json').write_text(
+                json.dumps(self.driver.get_cookies(), indent=2)
+            )
+        except:
+            pass
 
     #https://heykush.hashnode.dev/add-cookies-in-selenium
     def load_cookies(self, fichero: str):

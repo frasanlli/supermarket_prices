@@ -4,8 +4,8 @@ class Cesta():
     def __init__(self):
         self.hoy = datetime.now().strftime("%d_%m_%y")
         self.tipo_filtro=["clasificar", "eliminar", "seleccionar"]
-        self.lista_todos=["garbanzo", "lenteja", "alubia", "arroz",
-                        "leche entera", "manzana", "banana", "pimiento", "calabacín",
+        self.lista_todos=["garbanzo", "lenteja", "alubia", "arroz", "harina de trigo",
+                        "leche entera", "manzana", "banana", "pimiento", "tomate",
                         "cebolla", "berenjena", "huevos", "mantequilla", "patata",
                         "aceite de oliva", "aceite de girasol", "aceite de coco"]
 
@@ -26,9 +26,9 @@ class Cesta():
                             "tipo_filtro": self.tipo_filtro[2],
                             "filtro": ["arroz"]
                             },
-                        "pasta":{
-                            "tipo_filtro": "",
-                            "filtro": ""
+                        "harina":{
+                            "tipo_filtro": self.tipo_filtro[2],
+                            "filtro": ["harina de trigo"]
                             },
                         "leche entera":{
                             "tipo_filtro": self.tipo_filtro[0],
@@ -55,4 +55,8 @@ class Cesta():
             "agua":{
                     "tipo_filtro": self.tipo_filtro[1],
                     "filtro": ["gas", "coco"]
-                    },"""
+                    },
+            "pasta":{
+                            "tipo_filtro": "",
+                            "filtro": ""
+                            },"""

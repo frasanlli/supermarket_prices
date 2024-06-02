@@ -67,25 +67,32 @@ class Mercadona(Mozilla):
 
 
     #Anotar precio/cantidad_estandar del producto en la lista
-    def note_item_stPrice(self, product_quantity_prize_lines: list):
-        product_quantity= re.findall(r"\d+\,\d+", product_quantity_prize_lines[1])
-        self.data["precio por cantidad(€/cantidad)"].append(str(product_quantity[0]))
+    def note_item_stPrice(self, product_quantity_prize: list):
+        point_quantity_prize = product_quantity_prize[1].replace(",",".")
+        product_quantity= re.findall(r"\d+\.\d+", point_quantity_prize)
+        print(f"PRECIO/CANTIDAD(€/cantidad): {product_quantity}")
+        self.data["precio por cantidad(€/cantidad)"].append(float(product_quantity[0]))
 
 
     #Anotar nombre del producto en la lista
     def note_item_unitary_prize(self, selected_text: list):
-        product_price= re.findall(r"\d+\,\d+", selected_text[2])[0]
+        point_unitary_price = selected_text[2].replace(",",".")
+        point_unitary_price = re.split("€", point_unitary_price)
+        if(len(point_unitary_price)>2):
+            product_price= re.findall(r"\d+\.\d+", point_unitary_price[1])
+        else:
+            product_price= re.findall(r"\d+\.\d+", point_unitary_price[0])
         print(f"PRECIO UNDIAD(€): {product_price}")
-        self.data["precio unitario(€)"].append(product_price)
+        self.data["precio unitario(€)"].append(float(product_price[0]))
 
 
     #Filtro productos a clicar
     def get_item_list(self, element_bl):
-        lista_filtrada: list[str]=[]
+        lista_filtrada: list=list()
         #comprobamos si la subcategoría tiene filtro o no (diccionario)
         #filtro CLASIFICAR, Nombres no deben coincidir con subtipos
         if self.lista_mercadona[element_bl]["tipo_filtro"]==self.tipo_filtro[0]:
-            lista_filtrada=self.get_specific_list(element_bl)
+            lista_filtrada=self.get_specific_list(element_bl, lista_filtrada)
 
         #filtro ELIMINAR, Nombres no deben coincidir con subtipos
         elif self.lista_mercadona[element_bl]["tipo_filtro"]==self.tipo_filtro[1]:
@@ -133,18 +140,11 @@ class Mercadona(Mozilla):
             print(e)
             print ("ERROR: list not found")
 
-
-    def changeWord(self, word):
-        for letter in word:
-            if "," in letter:
-                word = word.replace(letter,".")
-        return word
-
     #Obtener listado de todos productos
     def get_complete_list(self):
         xpath="//button[@class='product-cell__content-link']"
         try:
-            filtered_list=[]
+            filtered_list= list()
             list_of_elements=self.driver.find_elements(By.XPATH, xpath)
             for e in list_of_elements:
                 filtered_list.append(e)
@@ -154,7 +154,7 @@ class Mercadona(Mozilla):
             print ("ERROR: list not found")
 
     #Obtener listado de productos filtrado
-    def get_specific_list(self, filtro: str, filtered_list: list[str]=[""]):
+    def get_specific_list(self, filtro: str, filtered_list: list[str]):
         xpath="//button[@class='product-cell__content-link']"
         try:
             list_of_elements=self.driver.find_elements(By.XPATH, xpath)
@@ -210,25 +210,30 @@ class Mercadona(Mozilla):
             print("ERROR: list of categories not found")
             self.driver.quit()
 
+    def main(self) ->list:
+        obj_supermercado.go_page()
+        obj_supermercado.load_cookies(obj_supermercado.nombre_super)
+
+        try:
+            botones_cookies=obj_supermercado.get_list_elements_by_attribute("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
+            botones_cookies[0].click()
+        except:
+            pass
+
+        try:
+            obj_supermercado.fill_input("name", "postalCode", "46019")
+            obj_supermercado.press_button("data-testid","postal-code-checker-button")
+            obj_supermercado.wait_dissapear(obj_supermercado.get_element_by_attribute("div", "class", "modal__click-outside"))
+        except:
+            pass
+
+        data:list = obj_supermercado.obtain_categories ("li")
+        return data
+
+
 if __name__== "__main__":
     obj_supermercado=Mercadona()
-    obj_supermercado.go_page()
-    obj_supermercado.load_cookies("mercadona")
-
-    try:
-        botones_cookies=obj_supermercado.get_list_elements_by_attribute("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
-        botones_cookies[0].click()
-    except:
-        pass
-
-    try:
-        obj_supermercado.fill_input("name", "postalCode", "46019")
-        obj_supermercado.press_button("data-testid","postal-code-checker-button")
-        obj_supermercado.wait_dissapear(obj_supermercado.get_element_by_attribute("div", "class", "modal__click-outside"))
-    except:
-        pass
-
-    data:list = obj_supermercado.obtain_categories ("li")
+    data = obj_supermercado.main()
     df=pd.DataFrame(data)
     df.to_csv(obj_supermercado.nombre_csv)
     df.to_excel(obj_supermercado.nombre_xlsx)
