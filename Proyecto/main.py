@@ -44,8 +44,8 @@ class main_class():
 
         data:list = obj_supermercado_md.obtain_categories ("li")
         df=pd.DataFrame(data)
-        df.to_csv('mercadona_'+self.hoy+'.csv')
-        df.to_excel('mercadona_'+self.hoy+'.xlsx')
+        df.to_csv('datos_csv//mercadona_'+self.hoy+'.csv')
+        df.to_excel('datos_excel//mercadona_'+self.hoy+'.xlsx')
         obj_supermercado_md.save_cookies("mercadona")
         obj_supermercado_md.driver.close()
 
@@ -71,9 +71,9 @@ class main_class():
 
     #MAIN
     def main(self):
-        #self.mercadona_data()
-        #self.carrefour_data()
-        #self.consum_data()
+        self.mercadona_data()
+        self.carrefour_data()
+        self.consum_data()
 
         self.reducir_datos()
 
