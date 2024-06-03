@@ -2,8 +2,9 @@ import re
 import time
 
 import pandas as pd
-from mozilla import Mozilla
 from selenium.webdriver.common.by import By
+
+from mozilla import Mozilla
 
 class Consum(Mozilla):
     def __init__(self):

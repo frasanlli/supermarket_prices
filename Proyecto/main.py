@@ -55,21 +55,19 @@ class main_class():
         print(df_final)
         df_final.to_csv('datos_csv//supermercados_'+self.hoy+'.csv')
         df_final.to_excel('datos_excel//supermercados_'+self.hoy+'.xlsx')
-        self.csv_a_json()
 
 
     def csv_a_json(self):
         df=pd.DataFrame(pd.read_csv(f"datos_csv//supermercados_{self.hoy}.csv", index_col=0))
-        df.to_json("supermercados.json")
-
+        df.to_json("supermercados.json", orient="records")
 
     #MAIN
     def main(self):
-        #self.mercadona_data()
-        #self.carrefour_data()
+        """self.mercadona_data()
+        self.carrefour_data()
         self.consum_data()
 
-        self.reducir_datos()
+        self.reducir_datos()"""
         self.csv_a_json()
 
 if __name__== "__main__":
