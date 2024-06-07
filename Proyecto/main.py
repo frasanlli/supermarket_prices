@@ -63,11 +63,11 @@ class main_class():
 
     #MAIN
     def main(self):
-        """self.mercadona_data()
-        self.carrefour_data()
+        #self.mercadona_data()
+        #self.carrefour_data()
         self.consum_data()
 
-        self.reducir_datos()"""
+        self.reducir_datos()
         self.csv_a_json()
 
 if __name__== "__main__":

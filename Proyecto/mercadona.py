@@ -7,17 +7,18 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from mozilla import Mozilla
-
+from cesta import Cesta
 
 class Mercadona(Mozilla):
     def __init__(self):
         super().__init__()
+        self.obj_cesta: Cesta = Cesta()
         self.nombre_super: str="mercadona"
         self.url: str= "https://tienda.mercadona.es/categories/"
         self.categories=r'category-menu__item'
 
-        self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.hoy+'.csv'
-        self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.hoy+'.xlsx'
+        self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.obj_cesta.hoy+'.csv'
+        self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.obj_cesta.hoy+'.xlsx'
 
     #Abrir página en navegador
     def go_page (self):
@@ -48,13 +49,13 @@ class Mercadona(Mozilla):
         self.data["nombre"].append(product_name)
 
         #filtro CLASIFICAR, Nombres coinciden pero hay subtipos
-        if self.lista_mercadona[element_bl]["tipo_filtro"]==self.tipo_filtro[0]:
-            for producto_simple in self.lista_mercadona[element_bl]["filtro"]:
+        if self.obj_cesta.lista_mercadona[element_bl]["tipo_filtro"]==self.obj_cesta.tipo_filtro[0]:
+            for producto_simple in self.obj_cesta.lista_mercadona[element_bl]["filtro"]:
                 if (producto_simple in product_name):
                     self.data["producto"].append(f"{element_bl} {producto_simple}")
                     break
-        elif self.lista_mercadona[element_bl]["tipo_filtro"]==self.tipo_filtro[2]:
-            for producto_simple in self.lista_mercadona[element_bl]["filtro"]:
+        elif self.obj_cesta.lista_mercadona[element_bl]["tipo_filtro"]==self.obj_cesta.tipo_filtro[2]:
+            for producto_simple in self.obj_cesta.lista_mercadona[element_bl]["filtro"]:
                 if (producto_simple in product_name):
                     self.data["producto"].append(producto_simple)
                     break
@@ -92,17 +93,17 @@ class Mercadona(Mozilla):
         lista_filtrada: list=list()
         #comprobamos si la subcategoría tiene filtro o no (diccionario)
         #filtro CLASIFICAR, Nombres no deben coincidir con subtipos
-        if self.lista_mercadona[element_bl]["tipo_filtro"]==self.tipo_filtro[0]:
+        if self.obj_cesta.lista_mercadona[element_bl]["tipo_filtro"]==self.obj_cesta.tipo_filtro[0]:
             lista_filtrada=self.get_specific_list(element_bl, lista_filtrada)
 
         #filtro ELIMINAR, Nombres no deben coincidir con subtipos
-        elif self.lista_mercadona[element_bl]["tipo_filtro"]==self.tipo_filtro[1]:
-            for filtro in self.lista_mercadona[element_bl]["filtro"]:
+        elif self.obj_cesta.lista_mercadona[element_bl]["tipo_filtro"]==self.obj_cesta.tipo_filtro[1]:
+            for filtro in self.obj_cesta.lista_mercadona[element_bl]["filtro"]:
                 lista_filtrada=self.get_negated_list(filtro)
 
         #filtro SELECCIONAR, Nombres solo deben coincidir con subtipos
-        elif self.lista_mercadona[element_bl]["tipo_filtro"]==self.tipo_filtro[2]:
-            for filtro in self.lista_mercadona[element_bl]["filtro"]:
+        elif self.obj_cesta.lista_mercadona[element_bl]["tipo_filtro"]==self.obj_cesta.tipo_filtro[2]:
+            for filtro in self.obj_cesta.lista_mercadona[element_bl]["filtro"]:
                 lista_filtrada=self.get_specific_list(filtro, lista_filtrada)
 
         #sin filtro, entra todo
@@ -198,7 +199,7 @@ class Mercadona(Mozilla):
                 #Comprobamos si las subcategorías incluyen elementos de la cesta básica
                 for subcat in list_of_subcategories:
                     print(subcat.text.lower())
-                    for bl in self.lista_mercadona:
+                    for bl in self.obj_cesta.lista_mercadona:
                         #Si las subcategorías incluyen elementos de la cesta, se abren clicando para pasar los elementos a CSS
                         if bl in subcat.text.lower() and "secos" not in subcat.text.lower():
                             subcat.click()

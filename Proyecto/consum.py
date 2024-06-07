@@ -5,12 +5,14 @@ import pandas as pd
 from selenium.webdriver.common.by import By
 
 from mozilla import Mozilla
+from cesta import Cesta
 
 class Consum(Mozilla):
     def __init__(self):
         super().__init__()
         self.nombre_super: str="consum"
         self.url: str= "https://tienda.consum.es/es#!Home"
+        self.obj_cesta: Cesta = Cesta()
 
         self.xpath_product_card: str = ""#"//div[@class='d-flex flex-column flex-grow-1 w-100 widget-prod__body ng-tns-c233-11']"
         self.xpath_precio_unitario: str = self.xpath_product_card+"//span[@id='grid-widget--price']"
@@ -29,8 +31,8 @@ class Consum(Mozilla):
                                   "https://tienda.consum.es/es/c/despensa/harina-levadura-pan-rallado/1646?orderById=11&page=1",
                                   "https://tienda.consum.es/es/c/frescos/verduras/pepino-pimiento/2211?orderById=11&page=1",
                                   "https://tienda.consum.es/es/c/despensa/lacteos-huevos/mantequilla-margarina/2094?orderById=11&page=1"]
-        self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.hoy+'.csv'
-        self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.hoy+'.xlsx'
+        self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.obj_cesta.hoy+'.csv'
+        self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.obj_cesta.hoy+'.xlsx'
 
     #Abrir página en navegador
     def go_page (self):
@@ -96,13 +98,13 @@ class Consum(Mozilla):
 
             if nombre != "":
                 contador+=1
-                for producto_evitar in self.lista_evitar:
+                for producto_evitar in self.obj_cesta.lista_evitar:
                     if producto_evitar in nombre:
                         evitar = True
 
                 if not evitar:
                     #for basic_producto in self.basic_list:
-                    for basic_producto in self.lista_todos:
+                    for basic_producto in self.obj_cesta.lista_todos:
                         if basic_producto in nombre:
                             seleccionado = True
                             print("PRODUCTO "+basic_producto)

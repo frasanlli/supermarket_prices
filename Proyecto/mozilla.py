@@ -7,9 +7,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.options import Options
 
-from cesta import Cesta
 
-class Mozilla(Cesta):
+class Mozilla():
     def __init__(self):
         super().__init__()
         options = webdriver.FirefoxOptions()

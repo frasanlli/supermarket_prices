@@ -5,11 +5,13 @@ import pandas as pd
 from selenium.webdriver.common.by import By
 
 from mozilla import Mozilla
+from cesta import Cesta
 
 class Carrefour(Mozilla):
     def __init__(self):
         super().__init__()
 
+        self.obj_cesta: Cesta = Cesta()
         self.nombre_super: str="carrefour"
         self.url: str= "https://www.carrefour.es/supermercado"
 
@@ -31,8 +33,8 @@ class Carrefour(Mozilla):
                                   "https://www.carrefour.es/supermercado/productos-frescos/quesos/cat20020/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/lacteos/cat20011/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/huevos/cat20021/c"]
-        self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.hoy+'.csv'
-        self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.hoy+'.xlsx'
+        self.nombre_csv=f'datos_csv//{self.nombre_super}_'+self.obj_cesta.hoy+'.csv'
+        self.nombre_xlsx=f'datos_excel//{self.nombre_super}_'+self.obj_cesta.hoy+'.xlsx'
 
     #Abrir página en navegador
     def go_page (self):
@@ -94,15 +96,15 @@ class Carrefour(Mozilla):
 
             if nombre != "":
                 contador+=1
-                for producto_evitar in self.lista_evitar:
+                for producto_evitar in self.obj_cesta.lista_evitar:
                     if producto_evitar in nombre:
                         evitar = True
 
                 if not evitar:
 
                     #for basic_producto in self.basic_list:
-                    for basic_producto in self.lista_todos:
-                        for producto_evitar in self.lista_evitar:
+                    for basic_producto in self.obj_cesta.lista_todos:
+                        for producto_evitar in self.obj_cesta.lista_evitar:
                             if producto_evitar in nombre:
                                 break
                         if basic_producto in nombre:

@@ -9,7 +9,7 @@ class Cesta():
                         "cebolla", "berenjena", "huevos", "mantequilla", "patata",
                         "aceite de oliva", "aceite de girasol"]
 
-        self.lista_evitar=["monodosis", "vinagre"]
+        self.lista_evitar=["monodosis", "vinagre", "pack", "porciones", "codorniz"]
         self.lista_mercadona={"aceite":{
                             "tipo_filtro": self.tipo_filtro[2],
                             "filtro": ["aceite de oliva", "aceite de girasol"]
