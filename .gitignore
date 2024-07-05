@@ -1,0 +1,14 @@
+cookies
+data_csv
+data_xlsx
+logs
+saved_data
+uml
+*.png
+*.json
+*.txt
+*.xlsx
+*.csv
+__pycache__
+*.pyc
+*.yaml
