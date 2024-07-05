@@ -121,16 +121,21 @@ class main_class():
 
 
     def frame_log(self, log_frame: tk.Frame)->None:
-        log_label: tk.Label = self.create_label(log_frame, "", 0, 2)
-
-        log_date_entry = ttk.Entry(log_frame)
-        log_date_entry.grid(column=0, row=1, padx=10, pady=10)
+        log_label: tk.Label = self.create_label(log_frame, "", 1, 0)
+        log_label.grid(rowspan=3)
 
         log_button: tk.Button = tk.Button(master=log_frame,
                                     text='Load log',
                                     cursor= "hand2",
                                     command= lambda: self.load_recent_log(log_label, log_date_entry.get()))
         log_button.grid(row=0, column=0)
+
+        log_label: tk.Label = self.create_label(log_frame,
+                                                """Introduce a date with format
+                                                dd-mm-yyyy. Example: 30-10-2024""",
+                                                 0, 1)
+        log_date_entry = ttk.Entry(log_frame)
+        log_date_entry.grid(column=0, row=2, padx=10, pady=10)
 
     def load_recent_log(self, log_label: tk.Label, date: str)->None:
         try:
@@ -155,7 +160,7 @@ class main_class():
         options_frame.pack()
 
         notebook.add(run_frame, text='Execution')
-        notebook.add(log_frame, text='Last log')
+        notebook.add(log_frame, text='Check logs')
         notebook.add(options_frame, text='Options')
 
         self.frame_run(run_frame)

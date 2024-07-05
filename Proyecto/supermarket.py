@@ -191,7 +191,7 @@ class Carrefour (Supermarket):
 
     def get_product_card(self, product_name: str):#->webElement:
         try:
-            element = self.obj_browser.get_element_parent(product_name, 5)
+            element = self.obj_browser.get_card_carrefour(product_name, 5, "a")
             if element:
                 self.obj_basket.data["product"].append(self.get_product(product_name))
                 print(f"PRODUCT_NAME: {product_name}")

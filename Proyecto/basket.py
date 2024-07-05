@@ -1,5 +1,3 @@
-import re
-
 from datetime import datetime
 from product import Product
 
@@ -23,7 +21,8 @@ class Basket():
                                     subproduct_words = ["garbanzo", "lenteja", "alubia"])
 
         arroz: Product = Product(product = "arroz",
-                                avoid_words = [" de ", " con ", " para ", "ultracongelado"],
+                                avoid_words = [" de ", " con ", " para ", "ultracongelado",
+                                               "harina", "galleta", "tortitas"],
                                 key_words = ["arroz"],
                                 subproduct_words = [])
 
@@ -36,13 +35,15 @@ class Basket():
                                 avoid_words = ["helado", "avena", "soja", "arroz", " con ", "dulce",
                                                " al ", " para ", "crema", "batido", "evaporada", "coco",
                                                " pan ", " pan", "fruta", "cereales", "polvo", "condensada",
-                                               "facial", "facial", "queso", "q."],
+                                               "facial", "facial", "queso", "q.", "galleta", "kit",
+                                               "chocolate", "salchicha"],
                                 key_words = ["leche"],
-                                subproduct_words = ["leche entera", "leche semidesnatada", "leche desnatada", "leche en polvo"])
+                                subproduct_words = ["leche entera", "leche semidesnatada", "leche desnatada",
+                                                    "leche en polvo", "leche sin lactosa"])
 
         fruta: Product = Product(product = "fruta",
                                 avoid_words = ["zumo", "batido", "congelado", "congelada", "vinagre",
-                                               " y ", "sabor", "postre", "leche"],
+                                               " y ", "sabor", "postre", "leche", "yogur"],
                                 key_words = ["manzana", "banana", "plátano", "platano"],
                                 subproduct_words = ["manzana", "banana", "plátano", "platano"])
 
@@ -50,13 +51,14 @@ class Basket():
                                 avoid_words = ["frito", "frita", "salsa", "polvo", " de ", " con ", "untar"
                                                "aperitivo", "light", " y ", "caramelizada", "troceado",
                                                "triturado", "frito", "piquillo", "freír", "hot", "picante",
-                                               "bolsa", "confitura"],
+                                               "bolsa", "confitura", "sardinilla"],
                                 key_words = ["pimiento", "tomate", "cebolla", "berenjena", "patata"],
                                 subproduct_words = [])
 
         huevo: Product = Product(product = "huevo",
-                                avoid_words = ["codorniz", " al ", "chocolate", "claras", "bizcocho", "sándwich",
-                                               "flan", "ensalada"],
+                                avoid_words = ["codorniz", " al ", "chocolate", "claras", "bizcocho",
+                                               "sándwich","flan", "ensalada", "sin", "sorpresa",
+                                               "kinder", "queso"],
                                 key_words = ["huevo", "docena"],
                                 subproduct_words = [])
 
@@ -70,7 +72,7 @@ class Basket():
                                                "porciones", " con ", "aliño", "corporal", "facial",
                                                "ricino", "baño", " para ", "solar", "abrillantador",
                                                "tortas", " pan ", "pastas", "protectora", "cantábrico",
-                                                "atún"],
+                                                "atún", "torta", "anchoa"],
                                 key_words = ["aceite","aceite de girasol","aceite de oliva"],
                                 subproduct_words = ["aceite de girasol","aceite de oliva"])
 
@@ -94,57 +96,3 @@ class Basket():
         self.products_list: list[Product] = [legumbres, arroz, harina, leche,
                                              fruta, verdura, huevo, mantequilla,
                                              aceite]
-
-
-    def note_item_name(self, selected_text: str):
-        """Note product real name"""
-        product_name = selected_text
-        print("NAME "+product_name)
-        self.data["name"].append(product_name)
-
-
-    def note_item_quantity(self, product_quantity_prize: str, unitary_prize: str):
-        """Note product quantity"""
-        try:
-            point_quantity_prize = product_quantity_prize.replace(",",".")
-            quantity_prize_num = float(re.findall("\d+\.\d+",point_quantity_prize)[0])
-        except Exception as e:
-            print(e)
-            #quantity_prize_num = float(re.findall("\d",point_quantity_prize)[0])
-
-        try:
-            point_unitary_prize = unitary_prize.replace(",",".")
-            unit_prize_num = float((re.findall("\d+\.\d+",point_unitary_prize)[0]))
-        except Exception as e:
-            print(e)
-            #unit_prize_num = float((re.findall("\d",point_unitary_prize)[0]))
-
-        quantity = unit_prize_num/quantity_prize_num
-        print("QUANTITY:"+str("%.2f" % quantity))
-        self.data["quantity"].append("%.2f" % quantity)
-
-
-    def note_item_stPrice(self, product_quantity_prize: str):
-        """Note product price/quantity"""
-        try:
-            point_quantity_prize = product_quantity_prize.replace(",",".")
-            quantity_prize_num = float(re.findall("\d+\.\d+",point_quantity_prize)[0])
-        except Exception as e:
-            print(e)
-            #quantity_prize_num = float(re.findall("\d",point_quantity_prize)[0])
-
-        print("PRICE(€/quantity):"+str(quantity_prize_num))
-        self.data["price per quantity(€/quantity)"].append(quantity_prize_num)
-
-
-    def note_item_unitary_prize(self, unitary_prize: str):
-        """Note product unitary price"""
-        try:
-            point_unitary_prize = unitary_prize.replace(",",".")
-            unit_prize_num = float((re.findall("\d+\.\d+",point_unitary_prize)[0]))
-        except Exception as e:
-            print(e)
-            #unit_prize_num = float((re.findall("\d",point_unitary_prize)[0]))
-
-        print("UNITARY PRICE(€):"+str(unit_prize_num))
-        self.data["unitary price(€)"].append(unit_prize_num)

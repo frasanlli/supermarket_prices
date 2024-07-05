@@ -52,7 +52,7 @@ class Browser():
     #Obtener lista empleando contenido que muestra como texto
     def get_elements_by_text (self, text_content: str)->list:
         #Returns
-        xpath="//*[contains(text(),"+text_content+"')]"
+        xpath="//*[contains(text(),'"+text_content+"')]"
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
             list_of_elements=self.driver.find_elements(By.XPATH, xpath)
@@ -157,10 +157,28 @@ class Browser():
 
     def get_element_parent(self, text_son: str, ancestor_n: int, tag: str = "*"):#-> WebElement
         #Returns WebElement's ancestor
-        go_father="//.."*ancestor_n
-        xpath = f"//{tag}[contains(text(),'{text_son}')]{go_father}"
+        go_father: str = "//.."*ancestor_n
+        xpath: str = f'//{tag}[contains(text(),"{text_son}")]{go_father}'
         try:
             WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
+            return self.driver.find_element(By.XPATH, xpath)
+        except Exception as e:
+            print(e)
+            print("Minor Error: element not clickable, trying next")
+
+    def get_card_carrefour(self, text_son: str, ancestor_n: int, tag: str = "a"):#-> WebElement
+        #Returns WebElement's ancestor limited to 22 characters (text_son)
+
+        #CHANGE, SEARCH CARD WITH A SON AS THE DEFINED TEXT_SON, RETURN IF FOUND
+
+        if len(text_son)>20:
+            text_son = text_son[:20]
+        go_father: str = "//.."*ancestor_n
+        xpath: str = f'//{tag}[contains(text(),"{text_son}")]'
+        try:
+            WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
+            element_position: str = self.driver.find_element(By.XPATH, xpath).get_attribute("data-position")
+            xpath: str = f"//a[@data-position='{element_position}']{go_father}"
             return self.driver.find_element(By.XPATH, xpath)
         except Exception as e:
             print(e)
