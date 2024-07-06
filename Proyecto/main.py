@@ -30,7 +30,7 @@ class main_class():
                      row_n: int, column_n: int, background: str=None)->tk.Label:
         label: tk.Label = tk.Label(master=my_frame, text=text_value,
                                     padx=10, pady=10, background=background)
-        label.grid(row=row_n, column=column_n)
+        label.grid(sticky="NSEW", row=row_n, column=column_n)
         return label
 
 
@@ -39,7 +39,7 @@ class main_class():
         button: tk.Button = tk.Button(master=my_frame, text=text_value,
                                           cursor= "hand2",
                                           command=lambda: self.new_thread(action))
-        button.grid(row=row_n, column=column_n)
+        button.grid(sticky="NSEW", row=row_n, column=column_n)
         return button
 
 
@@ -48,7 +48,7 @@ class main_class():
         button: tk.Button = tk.Button(master=my_frame, text=text_value,
                                           cursor= "hand2",
                                           command=lambda: self.open_dialog(action, label))
-        button.grid(row=row_n, column=column_n)
+        button.grid(sticky="NSEW", row=row_n, column=column_n)
         return button
 
 
@@ -121,8 +121,8 @@ class main_class():
 
 
     def frame_log(self, log_frame: tk.Frame)->None:
-        log_label: tk.Label = self.create_label(log_frame, "", 1, 0)
-        log_label.grid(rowspan=3)
+        log_label: tk.Label = self.create_label(log_frame, "", 0, 1)
+        log_label.grid(sticky="NSEW", rowspan=20, columnspan=10)
 
         log_button: tk.Button = tk.Button(master=log_frame,
                                     text='Load log',
@@ -130,12 +130,11 @@ class main_class():
                                     command= lambda: self.load_recent_log(log_label, log_date_entry.get()))
         log_button.grid(row=0, column=0)
 
-        log_label: tk.Label = self.create_label(log_frame,
-                                                """Introduce a date with format
-                                                dd-mm-yyyy. Example: 30-10-2024""",
-                                                 0, 1)
+        log_info_label: tk.Label = self.create_label(log_frame,
+                                                "Introduce a date with format dd-mm-yyyy.\n Example: 30-10-2024",
+                                                 1, 0)
         log_date_entry = ttk.Entry(log_frame)
-        log_date_entry.grid(column=0, row=2, padx=10, pady=10)
+        log_date_entry.grid(sticky="NSEW", column=0, row=2, padx=10, pady=10)
 
     def load_recent_log(self, log_label: tk.Label, date: str)->None:
         text: str =""
@@ -152,15 +151,15 @@ class main_class():
 
     def mainframe(self)->None:
         root: tk.Tk = tk.Tk(className="Ejecutador mejores precios")
-        notebook = ttk.Notebook(root)
-        notebook.pack(pady=10, expand=True)
+        notebook: ttk.Notebook = ttk.Notebook(root)
+        notebook.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
         run_frame: tk.Frame = tk.Frame(master=notebook)
-        run_frame.pack()
+        run_frame.pack(fill=tk.BOTH, expand=True)
         log_frame: tk.Frame = tk.Frame(master=notebook)
-        log_frame.pack()
+        log_frame.pack(fill=tk.BOTH, expand=True)
         options_frame: tk.Frame = tk.Frame(master=notebook)
-        options_frame.pack()
+        options_frame.pack(fill=tk.BOTH, expand=True)
 
         notebook.add(run_frame, text='Execution')
         notebook.add(log_frame, text='Check logs')
@@ -253,21 +252,21 @@ class main_class():
                                             text="Input format hh:mm.\n Example: 10:30",
                                             padx=10,
                                             pady=10)
-        label_message.grid(row=0,column=0, columnspan=2)
+        label_message.grid(sticky="NSEW", row=0,column=0, columnspan=2)
         entry_message: tk.Entry = tk.Entry(master=my_frame)
-        entry_message.grid(row=1,column=0)
+        entry_message.grid(sticky="NSEW", row=1,column=0)
 
         accept: tk.Button = tk.Button(master=my_frame,
                                     text='Accept',
                                     cursor= "hand2",
                                     command= check_input)
-        accept.grid(row=1,column=1)
+        accept.grid(sticky="NSEW", row=1,column=1)
 
         label_ad: tk.Label = tk.Label(master=my_frame,
                                         text="",
                                         padx=10,
                                         pady=10)
-        label_ad.grid(row=2,column=0, columnspan=2)
+        label_ad.grid(sticky="NSEW", row=2,column=0, columnspan=2)
 
 
     def new_thread(self, function: str)->None:
