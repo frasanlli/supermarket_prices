@@ -138,11 +138,14 @@ class main_class():
         log_date_entry.grid(column=0, row=2, padx=10, pady=10)
 
     def load_recent_log(self, log_label: tk.Label, date: str)->None:
+        text: str =""
         try:
             if date != "":
                 datetime.strptime(date, '%d-%m-%Y')
             text_log: list[str] = self.log.read_log(date)
-            log_label.config(text = text_log)
+            for text_line in text_log:
+                text+=text_line+"\n"
+            log_label.config(text = text)
         except:
             log_label.config(text = "Date format not valid. Try dd-mm-yyy")
 
@@ -321,7 +324,7 @@ class main_class():
             self.label_du_carrefour.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
             self.label_st_carrefour.config(text = "Off")
         except Exception as e:
-            self.label_st_consum.config(text = f"ERROR: Check log file")
+            self.label_st_carrefour.config(text = f"ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
             obj_supermarket.obj_browser.driver.close()
 

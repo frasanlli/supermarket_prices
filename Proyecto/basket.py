@@ -34,7 +34,7 @@ class Basket():
         leche: Product = Product(product = "leche",
                                 avoid_words = ["helado", "avena", "soja", "arroz", " con ", "dulce",
                                                " al ", " para ", "crema", "batido", "evaporada", "coco",
-                                               " pan ", " pan", "fruta", "cereales", "polvo", "condensada",
+                                               " pan ", "pan", "fruta", "cereales", "polvo", "condensada",
                                                "facial", "facial", "queso", "q.", "galleta", "kit",
                                                "chocolate", "salchicha"],
                                 key_words = ["leche"],

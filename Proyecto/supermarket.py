@@ -158,9 +158,6 @@ class Carrefour (Supermarket):
         self.url_list: list[str]=["https://www.carrefour.es/supermercado/productos-frescos/cat20002/c",
                                   "https://www.carrefour.es/supermercado/la-despensa/cat20001/c"]
 
-        #self.xpath_product_card: str = "//div[@class='product-card__detail']"
-        self.quantity_price_xpath: str = self.product_card_xpath+"//span[@class='product-card__price-per-unit']"
-
     @property
     def name_supermarket (self)->str:
         return "carrefour"
@@ -171,7 +168,7 @@ class Carrefour (Supermarket):
 
     @property
     def product_card_xpath(self)->str:
-        return "//div[@class='plp-food-view__list']"
+        return "//ul[@class='product-card-list__list']//div[@class='product-card__parent']"
 
     @property
     def product_name_xpath(self)->str:
@@ -180,18 +177,18 @@ class Carrefour (Supermarket):
     @property
     def unitary_price_xpath(self)->str:
         #In this supermarket could be discounts, actual price is //*//p[1]
-        return self.product_card_xpath +"//div[@class='product-card__prices']"
+        return "//div[@class='product-card__price']"
 
     @property
     def price_quantity_xpath(self)->str:
-        return ""
+        return "//span[@class='product-card__price-per-unit']"
 
     def fill_postal_code(self, postal_code: str)->None:
         pass
 
     def get_product_card(self, product_name: str):#->webElement:
         try:
-            element = self.obj_browser.get_card_carrefour(product_name, 5, "a")
+            element = self.obj_browser.get_card_carrefour(self.product_card_xpath, product_name)
             if element:
                 self.obj_basket.data["product"].append(self.get_product(product_name))
                 print(f"PRODUCT_NAME: {product_name}")
@@ -256,7 +253,6 @@ class Carrefour (Supermarket):
                 product_quantity_price = self.note_item_st_price(product_quantity_price)
                 unitary_price = self.note_item_unitary_price(unitary_price)
                 self.note_item_quantity(product_quantity_price, unitary_price)
-        time.sleep(2)
 
     def main(self)->None:
         self.go_supermarket(20)
@@ -267,9 +263,11 @@ class Carrefour (Supermarket):
             next_page: bool = True
             self.obj_browser.go_page(url, self.name_supermarket)
             self.check_web_error(url)
-            self.obj_browser.scroll_to_element("//span[@class='pagination__next icon-right-arrow-thin']")
-            time.sleep(1)
-            self.obj_browser.scroll_to_element("//span[@class='pagination__next icon-right-arrow-thin']")
+            self.obj_browser.scroll_to_element("//span[@class='pagination__results-item']")
+            #self.obj_browser.scroll_to_element("//span[@class='pagination__next icon-right-arrow-thin']")
+            time.sleep(3)
+            self.obj_browser.scroll_to_element("//span[@class='c-button__loader__container']")
+            #self.obj_browser.scroll_to_element("//span[@class='pagination__next icon-right-arrow-thin']")
             pages_text: str = self.obj_browser.get_element_by_xpath(self.page_values_xpath).text
             pages_text_list: list[str] = re.findall(r'\d+', pages_text)
             last_page: int = int(pages_text_list[1])
@@ -281,7 +279,7 @@ class Carrefour (Supermarket):
                 self.obtain_data()
                 if current_page != last_page:
                     self.obj_browser.press_element("span", "class", "pagination__next icon-right-arrow-thin")
-                    time.sleep(2)
+                    time.sleep(3)
                 else:
                     next_page=False
         self.obj_browser.driver.close()

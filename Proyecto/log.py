@@ -11,7 +11,7 @@ class Log():
     def write_log(self, text: str):
         f = open(f"logs//log_{self.now}.txt", "a")
         final_text: str = f"{self.get_time_now()} {text}"
-        f.write(final_text)
+        f.write(final_text+"\n")
         f.close()
 
     def read_log(self, date: str)->list[str]:
