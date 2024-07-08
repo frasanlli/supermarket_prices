@@ -1,4 +1,5 @@
 import json
+import random
 import time
 
 from pathlib import Path
@@ -14,7 +15,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
 
 class Browser():
-    def __init__(self):
+    def __init__(self)->None:
         super().__init__()
         options: webdriver.FirefoxOptions = webdriver.FirefoxOptions()
         #options.add_argument("-headless")
@@ -36,12 +37,13 @@ class Browser():
             if element.text == text_input:
                 return element
 
-    def go_page (self, url: str, supermarket_name: str):
+    def go_page (self, url: str, supermarket_name: str)->None:
         #Driver opens url
+        wait: float = random.uniform(4, 6)
         try:
             self.driver.maximize_window()
             self.driver.get(url)
-            self.driver.implicitly_wait(5)
+            self.driver.implicitly_wait(wait)
             #WebDriverWait(self.driver, 60).until(EC.presence_of_element_located("//div[@class='modal-content']"))
 
         except Exception as e:
@@ -112,7 +114,7 @@ class Browser():
                 pass
         return False
 
-    def get_one_element_by_text (self, text_content: str):
+    def get_one_element_by_text (self, text_content: str):#->WebElement:
         #Returns first WebElement found using its text content
         xpath=f"//*[contains(text(),'{text_content}')]"
         try:
@@ -125,7 +127,7 @@ class Browser():
             print("ERROR: element not found by its text")
             #self.driver.quit()
 
-    def get_elements_by_attribute (self, locator_value: str, attribute: str, attribute_content: str):
+    def get_elements_by_attribute (self, locator_value: str, attribute: str, attribute_content: str)->list:
         #Returns list of WebElements using attribute and attribute content
         list_final=[]
         xpath="//"+locator_value
@@ -169,7 +171,7 @@ class Browser():
     def get_card_carrefour(self, xpath_parent: str, text_son: str):#-> WebElement/None
         #Returns WebElement's ancestor limited to 22 characters (text_son)
         try:
-            WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath_parent)))
+            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath_parent)))
             elements_text = self.driver.find_elements(By.XPATH, xpath_parent)
             for e in elements_text:
                 if text_son in e.text:
@@ -193,18 +195,19 @@ class Browser():
             print(e)
             print("ERROR: element not found by its attribute")
 
-    def click_script_preciokilo(self, tag: str, attribute: str, attribute_content: str):
-
+    def click_script_preciokilo(self, tag: str, attribute: str, attribute_content: str)->None:
         xpath=f"//{tag}[@{attribute}='{attribute_content}']"
+        wait: float = random.uniform(1, 2)
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
             button = self.get_one_element_by_text("Precio por kilo")
             self.driver.execute_script("arguments[0].click();", button)
+            self.driver.implicitly_wait(1.5)
         except Exception as e:
             print(e)
             print("ERROR: button not clicked")
 
-    def click_script(self, tag: str, attribute: str, attribute_content: str):
+    def click_script(self, tag: str, attribute: str, attribute_content: str)->None:
         #Clicks webelement using javascript
         xpath=f"//{tag}[@{attribute}='{attribute_content}']"
         if (attribute==""):
@@ -217,7 +220,7 @@ class Browser():
             print(e)
             print("ERROR: not clicked")
 
-    def press_button (self, attribute: str, attribute_content: str):
+    def press_button (self, attribute: str, attribute_content: str)->None:
         #Press button tag
         xpath="//button[@"+attribute+"='"+attribute_content+"']"
         try:
@@ -228,18 +231,20 @@ class Browser():
             print(e)
             print("ERROR: button not clicked")
 
-    def press_element (self, element: str, attribute: str, attribute_content: str):
+    def press_element (self, element: str, attribute: str, attribute_content: str)->bool:
         #Click first WebElement found using tag+attribute+attribute_value
         xpath=f"//{element}[@{attribute}='{attribute_content}']"
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
             button=self.driver.find_element(By.XPATH, xpath)
             button.click()
+            return True
         except Exception as e:
             print(e)
             print("ERROR: button not clicked")
+            return False
 
-    def press_href(self, link_value: str):
+    def press_href(self, link_value: str)->None:
         #Click link contained in a href attribute
         xpath="//a[@href='"+link_value+"']"
         try:
@@ -250,7 +255,7 @@ class Browser():
             print(e)
             print("ERROR: button not clicked")
 
-    def fill_input (self, attribute: str, attribute_value: str, input_text: str):
+    def fill_input (self, attribute: str, attribute_value: str, input_text: str)->None:
         #Introduce data in an input tag
         xpath="//input[@"+attribute+"='"+attribute_value+"']"
         WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
@@ -262,7 +267,7 @@ class Browser():
             print(e)
             print ("ERROR: search element not found")
 
-    def wait_dissapear(self, element_web, wait_time: int):
+    def wait_dissapear(self, element_web, wait_time: int)->None:
         #Wait WebElement to dissapear
         n: int = 0
         while True or n<5:
@@ -273,7 +278,7 @@ class Browser():
                 n+=1
                 pass
 
-    def save_cookies(self, file_name: str):
+    def save_cookies(self, file_name: str)->None:
         path_value: Path = Path(f'cookies//{file_name}_cookies.json')
         try:
             path_value.write_text(
@@ -284,7 +289,8 @@ class Browser():
             pass
 
     #https://heykush.hashnode.dev/add-cookies-in-selenium
-    def load_cookies(self, file_name: str):
+    def load_cookies(self, file_name: str)->bool:
+        wait: float = random.uniform(8, 11)
         try:
             with open(f'cookies//{file_name}_cookies.json', 'r') as f:
                 cookies = json.load(f) #stoting cookies
@@ -294,18 +300,20 @@ class Browser():
                         cookie['sameSite'] = 'Strict'
                     self.driver.add_cookie(cookie) #add the cookies
             self.driver.refresh()
-            time.sleep(10) # add wait to load the cookies
+            time.sleep(wait) # add wait to load the cookies
+            return True
         except Exception as e:
             print(f"Cookies could not be loaded \n {e}")
-            pass
+            return False
 
-    def scroll_to_element(self, xpath):
+    def scroll_to_element(self, xpath)->None:
         """Scrolls bar to WebElement if exists"""
+        wait: float = random.uniform(1.5, 2.5)
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
             element = self.driver.find_element(By.XPATH, xpath)
             self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
-            time.sleep(2)
+            time.sleep(wait)
         except Exception as e:
             print(e)
             print("ERROR: button not clicked")

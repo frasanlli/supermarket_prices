@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import os
+import random
 import re
 import time
 
@@ -68,13 +69,16 @@ class Supermarket(ABC):
             self.obj_browser.driver.quit()
 
     def accept_cookies (self, xpath_tag: str, xpath_attribute: str, xpath_att_value: str):
-        try:
-            button = self.obj_browser.get_element_by_attribute(xpath_tag, xpath_attribute, xpath_att_value)
-            button.click()
-            self.obj_browser.wait_dissapear(button, 1)
-        except:
-            print("Cookies loaded. Step not necessary")
-            pass
+        loaded: bool = self.obj_browser.load_cookies(self.name_supermarket)
+        if not loaded:
+            try:
+                button = self.obj_browser.get_element_by_attribute(xpath_tag, xpath_attribute, xpath_att_value)
+                button.click()
+                self.obj_browser.wait_dissapear(button, 1)
+                self.obj_browser.save_cookies(self.name_supermarket)
+            except Exception as e:
+                print(f"Button could not be clicked. \n {e}")
+                self.obj_browser.driver.close()
 
     def check_product(self, real_name: str)->bool:
         value: bool = False
@@ -231,6 +235,12 @@ class Carrefour (Supermarket):
             print(e)
             #unit_price_num = float((re.findall(r"\d",point_unitary_price)[0]))
 
+    def check_current_page(self)->None:
+        web: str = "https://www.carrefour.es/supermercado"
+        current_web: str = self.obj_browser.driver.current_url
+        if web == current_web:
+            self.obj_browser.driver.back()
+
     def obtain_data(self)->None:
         products_names: list[str] = list()
         products_upper_initial: list[str] = list()
@@ -245,45 +255,56 @@ class Carrefour (Supermarket):
                 products_upper_names.append(e)
 
         for product_name_card in products_names:
-            card = self.get_product_card(products_upper_names[products_names.index(product_name_card)])
-            if card:
-                self.obj_basket.data["supermarket"].append(self.name_supermarket)
-                unitary_price = card.get_attribute("app_price")
-                product_quantity_price = card.get_attribute("app_price_per_unit")
-                product_quantity_price = self.note_item_st_price(product_quantity_price)
-                unitary_price = self.note_item_unitary_price(unitary_price)
-                self.note_item_quantity(product_quantity_price, unitary_price)
+            while True:
+                card = self.get_product_card(products_upper_names[products_names.index(product_name_card)])
+                if card:
+                    break
+            self.obj_basket.data["supermarket"].append(self.name_supermarket)
+            unitary_price = card.get_attribute("app_price")
+            product_quantity_price = card.get_attribute("app_price_per_unit")
+            product_quantity_price = self.note_item_st_price(product_quantity_price)
+            unitary_price = self.note_item_unitary_price(unitary_price)
+            self.note_item_quantity(product_quantity_price, unitary_price)
+
+    def press_next_page(self)->None:
+        wait: float = 0
+        next_page: bool = True
+        while next_page:
+            clicked: bool = False
+            pages_text: str = self.obj_browser.get_element_by_xpath(self.page_values_xpath).text
+            pages_text_list: list[str] = re.findall(r'\d+', pages_text)
+            last_page: int = int(pages_text_list[1])
+            current_page_str: str = pages_text_list[0]
+            current_page: int = int(current_page_str)
+            self.obtain_data()
+            if current_page != last_page:
+                wait = random.uniform(2.5, 3.6)
+                for i in range(1, 3):
+                    self.obj_browser.scroll_to_element("//span[@class='c-button__loader__container']")
+                    clicked = self.obj_browser.press_element("span",
+                                                            "class",
+                                                            "pagination__next icon-right-arrow-thin")
+                    if clicked:
+                        break
+                    elif not clicked and i==3:
+                        print("error")
+                time.sleep(wait)
+                self.check_current_page()
+                time.sleep(wait)
+            else:
+                next_page=False
 
     def main(self)->None:
         self.go_supermarket(20)
         self.accept_cookies("button", "id", "onetrust-reject-all-handler")
         self.obj_browser.click_script("span","class","icon-cross-thin")
-
         for url in self.url_list:
-            next_page: bool = True
             self.obj_browser.go_page(url, self.name_supermarket)
             self.check_web_error(url)
             self.obj_browser.scroll_to_element("//span[@class='pagination__results-item']")
-            #self.obj_browser.scroll_to_element("//span[@class='pagination__next icon-right-arrow-thin']")
-            time.sleep(3)
-            self.obj_browser.scroll_to_element("//span[@class='c-button__loader__container']")
-            #self.obj_browser.scroll_to_element("//span[@class='pagination__next icon-right-arrow-thin']")
-            pages_text: str = self.obj_browser.get_element_by_xpath(self.page_values_xpath).text
-            pages_text_list: list[str] = re.findall(r'\d+', pages_text)
-            last_page: int = int(pages_text_list[1])
-
-            while next_page:
-                current_page_str: str = pages_text_list[0]
-                current_page: int = int(current_page_str)
-                #self.obj_browser.click_script_preciokilo("button", "class", "c-link sort-options__list__item__link c-link--size-m c-link--tone-monochrome")
-                self.obtain_data()
-                if current_page != last_page:
-                    self.obj_browser.press_element("span", "class", "pagination__next icon-right-arrow-thin")
-                    time.sleep(3)
-                else:
-                    next_page=False
+            self.obj_browser.scroll_to_element("//span[@class='pagination__next icon-right-arrow-thin']")
+            self.press_next_page()
         self.obj_browser.driver.close()
-
 
 if __name__== "__main__":
     obj_supermarket = Carrefour()

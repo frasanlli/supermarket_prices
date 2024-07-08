@@ -282,10 +282,13 @@ class main_class():
         process_thread.start()
 
     def process_data(self, datos: list, obj_supermarket)->None:
-        df = pd.DataFrame(datos)
-        df.to_csv(obj_supermarket.name_csv)
-        df.to_excel(obj_supermarket.name_xlsx)
-
+        try:
+            df = pd.DataFrame(datos)
+            df.to_csv(obj_supermarket.name_csv)
+            df.to_excel(obj_supermarket.name_xlsx)
+        except Exception as e:
+            self.label_st_carrefour.config(text = f"ERROR: Check log file")
+            self.log.write_log(f"ERROR: {e}")
 
     def consum_data(self)->None:
         self.log.write_log("RUNNING: Consum")
@@ -297,15 +300,14 @@ class main_class():
             obj_supermarket=Consum()
             obj_supermarket.main()
             self.log.write_log("RUNNING: main() Consum completed")
-            self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
-            self.log.write_log("RUNNING: process_data() Consum completed")
-
-            self.label_du_consum.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
-            self.label_st_consum.config(text = "Off")
         except Exception as e:
             self.label_st_consum.config(text = f"ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
             obj_supermarket.obj_browser.driver.close()
+        self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
+        self.log.write_log("RUNNING: process_data() Consum completed")
+        self.label_du_consum.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
+        self.label_st_consum.config(text = "Off")
 
     def carrefour_data(self)->None:
         self.log.write_log("RUNNING: Carrefour")
@@ -313,19 +315,19 @@ class main_class():
             starttime = time.perf_counter()
             self.label_st_carrefour.config(text = "Running..")
             self.label_ex_carrefour.config(text = self.today)
-
             obj_supermarket=Carrefour()
             obj_supermarket.main()
-            self.log.write_log("RUNNING: main() Consum completed")
-            self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
-            self.log.write_log("RUNNING: process_data() Consum completed")
-
-            self.label_du_carrefour.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
-            self.label_st_carrefour.config(text = "Off")
         except Exception as e:
             self.label_st_carrefour.config(text = f"ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
             obj_supermarket.obj_browser.driver.close()
+
+        self.log.write_log("RUNNING: main() Consum completed")
+        self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
+        self.log.write_log("RUNNING: process_data() Consum completed")
+        self.label_du_carrefour.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
+        self.label_st_carrefour.config(text = "Off")
+
 
     def mercadona_data(self)->None:
         self.log.write_log(f"RUNNING: Mercadona")
@@ -337,15 +339,15 @@ class main_class():
             obj_supermarket=Mercadona()
             obj_supermarket.main()
             self.log.write_log("RUNNING: main() Consum completed")
-            self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
-            self.log.write_log("RUNNING: process_data() Consum completed")
-
-            self.label_du_mercadona.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
-            self.label_st_mercadona.config(text = "Complete")
         except Exception as e:
             self.label_st_consum.config(text = f"ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
             obj_supermarket.obj_browser.driver.close()
+
+        self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
+        self.log.write_log("RUNNING: process_data() Consum completed")
+        self.label_du_mercadona.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
+        self.label_st_mercadona.config(text = "Complete")
 
     def reduce_data(self)->None:
         df_total = []
