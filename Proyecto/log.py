@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 
 class Log():
@@ -11,7 +11,7 @@ class Log():
     def get_time_now(self)->datetime:
         return datetime.now().strftime("%d-%m-%Y, [%H:%M] : ")
 
-    def write_log(self, text: str):
+    def write_log(self, text: str) -> None:
         f = open(self.doc_name, "a")
         final_text: str = f"{self.get_time_now()} {text}"
         f.write(final_text+"\n")

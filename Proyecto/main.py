@@ -1,12 +1,12 @@
 import os
-import pandas as pd
 import threading
 import time
 from tkinter import messagebox
 from tkinter import ttk
 from datetime import datetime, timedelta
+import pandas as pd
 from log import Log
-from supermarket import Carrefour
+from carrefour import Carrefour
 from mercadona import Mercadona
 from consum import Consum
 
@@ -145,7 +145,8 @@ class main_class():
             for text_line in text_log:
                 text+=text_line+"\n"
             log_label.config(text = text)
-        except:
+        except Exception as e:
+            self.log.write_log(f"MAIN: Tried to load Log with no valid date format. \n {e}")
             log_label.config(text = "Date format not valid. Try dd-mm-yyy")
 
 
@@ -200,9 +201,9 @@ class main_class():
         print(f"Current time: {self.today_time}")
         try:
             print(f"Next...{self.label_next_mercadona.cget("text")}")
-        except:
+        except Exception as e:
             self.log.write_log("Program closed")
-            #Exit in case root is destroyed
+            self.log.write_log(f"MAIN: Tried to get label value, but program is not running. \n {e}")
             exit()
         if self.today_time in self.label_next_all.cget("text"):
             print("Run main")
@@ -242,6 +243,7 @@ class main_class():
 
             except ValueError:
                 label_ad.config(text = "Option not valid")
+                self.log.write_log("MAIN: Programmed execution time is not valid.")
                 return False
 
         root = tk.Tk(className=f"Program execution {option}")
@@ -287,7 +289,7 @@ class main_class():
             df.to_csv(obj_supermarket.name_csv)
             df.to_excel(obj_supermarket.name_xlsx)
         except Exception as e:
-            self.label_st_carrefour.config(text = f"ERROR: Check log file")
+            self.label_st_carrefour.config(text = "ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
 
     def consum_data(self)->None:
@@ -298,10 +300,11 @@ class main_class():
             self.label_ex_consum.config(text = self.today)
 
             obj_supermarket=Consum()
-            obj_supermarket.main()
+            errors = obj_supermarket.main()
+            self.log.write_log(errors)
             self.log.write_log("RUNNING: main() Consum completed")
         except Exception as e:
-            self.label_st_consum.config(text = f"ERROR: Check log file")
+            self.label_st_consum.config(text = "ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
             obj_supermarket.obj_browser.driver.close()
         self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
@@ -310,19 +313,21 @@ class main_class():
         self.label_st_consum.config(text = "Off")
 
     def carrefour_data(self)->None:
+        errors: list[str] = list()
         self.log.write_log("RUNNING: Carrefour")
         try:
             starttime = time.perf_counter()
             self.label_st_carrefour.config(text = "Running..")
             self.label_ex_carrefour.config(text = self.today)
             obj_supermarket=Carrefour()
-            obj_supermarket.main()
+            errors = obj_supermarket.main()
+            self.log.write_log(errors)
+            self.log.write_log("RUNNING: main() Consum completed")
         except Exception as e:
-            self.label_st_carrefour.config(text = f"ERROR: Check log file")
+            self.label_st_carrefour.config(text = "ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
             obj_supermarket.obj_browser.driver.close()
 
-        self.log.write_log("RUNNING: main() Consum completed")
         self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
         self.log.write_log("RUNNING: process_data() Consum completed")
         self.label_du_carrefour.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
@@ -330,17 +335,18 @@ class main_class():
 
 
     def mercadona_data(self)->None:
-        self.log.write_log(f"RUNNING: Mercadona")
+        self.log.write_log("RUNNING: Mercadona")
         try:
             starttime = time.perf_counter()
             self.label_st_mercadona.config(text = "Running..")
             self.label_ex_mercadona.config(text = self.today)
 
             obj_supermarket=Mercadona()
-            obj_supermarket.main()
+            errors = obj_supermarket.main()
+            self.log.write_log(errors)
             self.log.write_log("RUNNING: main() Consum completed")
         except Exception as e:
-            self.label_st_consum.config(text = f"ERROR: Check log file")
+            self.label_st_consum.config(text = "ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
             obj_supermarket.obj_browser.driver.close()
 
@@ -372,18 +378,14 @@ class main_class():
     #MAIN
     def main(self)->None:
         starttime = time.perf_counter()
-        # update text label
         self.label_st_all.config(text = "Running..")
         self.label_ex_all.config(text = self.today)
-
         self.mercadona_data()
         self.carrefour_data()
         self.consum_data()
-
         self.label_st_all.config(text = "Reducing data..")
         self.reduce_data()
         self.csv_a_json()
-
         self.label_du_all.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_all.config(text = "Complete")
 

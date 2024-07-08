@@ -4,7 +4,7 @@ import time
 from supermarket import Supermarket
 
 class Mercadona (Supermarket):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
     @property
@@ -32,20 +32,19 @@ class Mercadona (Supermarket):
     def price_quantity_xpath(self)->str:
         return "//div[@class='product-format product-format__size']//span[1]"
 
-    def fill_postal_code(self, postal_code: str):
+    def fill_postal_code(self, postal_code: str) -> None:
         try:
             self.obj_browser.fill_input("name", "postalCode", postal_code)
             button = self.obj_browser.get_element_by_attribute("button", "data-testid", "postal-code-checker-button")
             button.click()
             self.obj_browser.wait_dissapear(button, 1)
-        except:
-            print("Cookies loaded. Step not necessary")
-            pass
+        except Exception as e:
+            self.errors.append(f"ERROR MERCADONA: Cookies loaded. Step fill postal code not necessary\n {e}")
 
-    def get_product_card(self, product_name_card):
+    def get_product_card(self, product_name_card) -> None:
         self.obj_browser.press_element_parent(product_name_card)
 
-    def obtain_data(self):
+    def obtain_data(self) -> None:
         products_names: list[str] = list()
         products_upper_initial: list[str] = list()
         products_upper_names: list[str] = list()
@@ -57,8 +56,6 @@ class Mercadona (Supermarket):
                 products_upper_names.append(e)
 
         for product_name_card in products_names:
-            #print(products_names)
-            #print(products_upper_names)
             self.get_product_card(products_upper_names[products_names.index(product_name_card)])
             product_web = self.obj_browser.get_element_by_attribute("div","data-testid","private-product-detail-info")
 
@@ -85,11 +82,11 @@ class Mercadona (Supermarket):
                 exit_button=self.obj_browser.get_element_by_attribute("button","class", "modal-content__close")
                 time.sleep(1)
                 exit_button.click()
-
                 time.sleep(3)
 
-    def open_subcategory_products(self):
-        list_of_categories = self.obj_browser.get_elements_by_attribute("li", "class", "category-menu__item")
+    def open_subcategory_products(self) -> None:
+        list_of_subcategories: list = list()
+        list_of_categories: list = self.obj_browser.get_elements_by_attribute("li", "class", "category-menu__item")
         for category in list_of_categories:
             category.click()
             list_of_subcategories=self.obj_browser.get_elements_by_attribute("button", "class", "category-item__link")
@@ -97,8 +94,7 @@ class Mercadona (Supermarket):
                 subcategory.click()
                 self.obtain_data()
 
-
-    def note_item_st_price(self, product_quantity_price: str):
+    def note_item_st_price(self, product_quantity_price: str) -> None:
         """Note product price/quantity"""
         try:
             point_quantity_price = product_quantity_price.replace(",",".")
@@ -106,27 +102,23 @@ class Mercadona (Supermarket):
             print("PRICE(€/quantity):"+str(quantity_price_num))
             self.obj_basket.data["price per quantity(€/quantity)"].append(quantity_price_num)
         except Exception as e:
-            print(e)
-            #quantity_price_num = float(re.findall("\d",point_quantity_price)[0])
+            self.errors.append(f"ERROR MERCADONA: not possible to note item's price/quantity\n {e}")
 
-
-    def note_item_unitary_price(self, unitary_price: str):
+    def note_item_unitary_price(self, unitary_price: str) -> None:
         """Note product unitary price"""
         try:
             unit_price_num = float(unitary_price.replace(" ", ""))
             self.obj_basket.data["unitary price(€)"].append(unit_price_num)
         except Exception as e:
-            print(e)
-            #unit_price_num = float((re.findall("\d",point_unitary_price)[0]))
+            self.errors.append(f"ERROR MERCADONA: not possible to note item's unitary price\n {e}")
 
-
-    def main(self):
+    def main(self) -> list[str]:
         self.go_supermarket(20)
         self.fill_postal_code(self.postal_code)
         self.accept_cookies("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
         self.open_subcategory_products()
-
         self.obj_browser.driver.close()
+        return self.errors
 
 if __name__== "__main__":
     obj_supermarket=Mercadona()
