@@ -37,7 +37,7 @@ class Mercadona (Supermarket):
             self.obj_browser.fill_input("name", "postalCode", postal_code)
             button = self.obj_browser.get_element_by_attribute("button", "data-testid", "postal-code-checker-button")
             button.click()
-            self.obj_browser.wait_dissapear(button, 1)
+            self.obj_browser.driver.implicitly_wait(5)
         except Exception as e:
             self.errors.append(f"ERROR MERCADONA: Cookies loaded. Step fill postal code not necessary\n {e}")
 
@@ -98,7 +98,7 @@ class Mercadona (Supermarket):
         """Note product price/quantity"""
         try:
             point_quantity_price = product_quantity_price.replace(",",".")
-            quantity_price_num = float(re.findall("\d+\.\d+",point_quantity_price)[0])
+            quantity_price_num = float(re.findall(r"\d+\.\d+",point_quantity_price)[0])
             print("PRICE(€/quantity):"+str(quantity_price_num))
             self.obj_basket.data["price per quantity(€/quantity)"].append(quantity_price_num)
         except Exception as e:
@@ -112,13 +112,14 @@ class Mercadona (Supermarket):
         except Exception as e:
             self.errors.append(f"ERROR MERCADONA: not possible to note item's unitary price\n {e}")
 
-    def main(self) -> list[str]:
-        self.go_supermarket(20)
+    def main(self) -> None:
+        self.go_supermarket(10)
         self.fill_postal_code(self.postal_code)
         self.accept_cookies("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
         self.open_subcategory_products()
         self.obj_browser.driver.close()
-        return self.errors
+        self.log.write_log(self.errors)
+        self.log.write_log(f"RUNNING: {self.name_supermarket}.main() completed")
 
 if __name__== "__main__":
     obj_supermarket=Mercadona()

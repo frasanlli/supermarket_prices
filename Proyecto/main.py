@@ -1,6 +1,7 @@
 import os
 import threading
 import time
+import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 from datetime import datetime, timedelta
@@ -9,8 +10,6 @@ from log import Log
 from carrefour import Carrefour
 from mercadona import Mercadona
 from consum import Consum
-
-import tkinter as tk
 
 class main_class():
     def __init__(self) -> None:
@@ -73,16 +72,16 @@ class main_class():
             self.create_button_thread(run_frame, run_buttons_text[n], run_buttons_actions[n], n+1, 1)
 
         #----------------COL2 Last execution
-        self.label_ex_all: tk.Label = self.create_label(run_frame, "01/01/1970", 1, 2)
-        self.label_ex_mercadona: tk.Label = self.create_label(run_frame, "01/01/1970", 2, 2)
-        self.label_ex_consum: tk.Label = self.create_label(run_frame, "01/01/1970", 3, 2)
-        self.label_ex_carrefour: tk.Label = self.create_label(run_frame, "01/01/1970", 4, 2)
+        self.label_ex_all: tk.Label = self.create_label(run_frame, "dd/mm/YYYY", 1, 2)
+        self.label_ex_mercadona: tk.Label = self.create_label(run_frame, "dd/mm/YYYY", 2, 2)
+        self.label_ex_consum: tk.Label = self.create_label(run_frame, "dd/mm/YYYY", 3, 2)
+        self.label_ex_carrefour: tk.Label = self.create_label(run_frame, "dd/mm/YYYY", 4, 2)
 
         #----------------COL3 Last duration
-        self.label_du_all: tk.Label = self.create_label(run_frame, "0:40:00", 1, 3)
-        self.label_du_mercadona: tk.Label = self.create_label(run_frame, "0:40:00", 2, 3)
-        self.label_du_consum: tk.Label = self.create_label(run_frame, "0:40:00", 3, 3)
-        self.label_du_carrefour: tk.Label = self.create_label(run_frame, "0:40:00", 4, 3)
+        self.label_du_all: tk.Label = self.create_label(run_frame, "-:--:--", 1, 3)
+        self.label_du_mercadona: tk.Label = self.create_label(run_frame, "-:--:--", 2, 3)
+        self.label_du_consum: tk.Label = self.create_label(run_frame, "-:--:--", 3, 3)
+        self.label_du_carrefour: tk.Label = self.create_label(run_frame, "-:--:--", 4, 3)
 
         #----------------COL5 next exe
         self.label_next_all: tk.Label = self.create_label(run_frame, "Not set", 1, 5)
@@ -283,77 +282,67 @@ class main_class():
             process_thread = threading.Thread(target=self.carrefour_data, name="carrefour")
         process_thread.start()
 
-    def process_data(self, datos: list, obj_supermarket)->None:
+    def process_data(self, datos: list, obj_supermarket, label: tk.Label)->None:
         try:
             df = pd.DataFrame(datos)
             df.to_csv(obj_supermarket.name_csv)
             df.to_excel(obj_supermarket.name_xlsx)
         except Exception as e:
+            label.config(text = "ERROR: Check log file")
             self.label_st_carrefour.config(text = "ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
 
     def consum_data(self)->None:
-        self.log.write_log("RUNNING: Consum")
         try:
             starttime = time.perf_counter()
             self.label_st_consum.config(text = "Running..")
             self.label_ex_consum.config(text = self.today)
-
             obj_supermarket=Consum()
-            errors = obj_supermarket.main()
-            self.log.write_log(errors)
-            self.log.write_log("RUNNING: main() Consum completed")
+            obj_supermarket.main()
         except Exception as e:
             self.label_st_consum.config(text = "ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
             obj_supermarket.obj_browser.driver.close()
-        self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
+
+        self.process_data(obj_supermarket.obj_basket.data, obj_supermarket, self.label_st_consum)
         self.log.write_log("RUNNING: process_data() Consum completed")
         self.label_du_consum.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_consum.config(text = "Off")
 
     def carrefour_data(self)->None:
-        errors: list[str] = list()
-        self.log.write_log("RUNNING: Carrefour")
         try:
             starttime = time.perf_counter()
             self.label_st_carrefour.config(text = "Running..")
             self.label_ex_carrefour.config(text = self.today)
             obj_supermarket=Carrefour()
-            errors = obj_supermarket.main()
-            self.log.write_log(errors)
-            self.log.write_log("RUNNING: main() Consum completed")
+            obj_supermarket.main()
         except Exception as e:
             self.label_st_carrefour.config(text = "ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
             obj_supermarket.obj_browser.driver.close()
 
-        self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
+        self.process_data(obj_supermarket.obj_basket.data, obj_supermarket, self.label_st_carrefour)
         self.log.write_log("RUNNING: process_data() Consum completed")
         self.label_du_carrefour.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_carrefour.config(text = "Off")
 
 
     def mercadona_data(self)->None:
-        self.log.write_log("RUNNING: Mercadona")
         try:
             starttime = time.perf_counter()
             self.label_st_mercadona.config(text = "Running..")
             self.label_ex_mercadona.config(text = self.today)
-
             obj_supermarket=Mercadona()
-            errors = obj_supermarket.main()
-            self.log.write_log(errors)
-            self.log.write_log("RUNNING: main() Consum completed")
+            obj_supermarket.main()
         except Exception as e:
             self.label_st_consum.config(text = "ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}")
             obj_supermarket.obj_browser.driver.close()
 
-        self.process_data(obj_supermarket.obj_basket.data, obj_supermarket)
+        self.process_data(obj_supermarket.obj_basket.data, obj_supermarket, self.label_st_mercadona)
         self.log.write_log("RUNNING: process_data() Consum completed")
         self.label_du_mercadona.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
-        self.label_st_mercadona.config(text = "Complete")
+        self.label_st_mercadona.config(text = "Off")
 
     def reduce_data(self)->None:
         df_total = []
@@ -387,7 +376,7 @@ class main_class():
         self.reduce_data()
         self.csv_a_json()
         self.label_du_all.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
-        self.label_st_all.config(text = "Complete")
+        self.label_st_all.config(text = "Off")
 
 if __name__== "__main__":
     obj_main = main_class()

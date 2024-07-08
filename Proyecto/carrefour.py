@@ -140,7 +140,7 @@ class Carrefour (Supermarket):
             else:
                 next_page=False
 
-    def main(self)->list[str]:
+    def main(self) -> None:
         self.go_supermarket(20)
         self.accept_cookies("button", "id", "onetrust-reject-all-handler")
         self.obj_browser.click_script("span","class","icon-cross-thin")
@@ -151,7 +151,8 @@ class Carrefour (Supermarket):
             self.obj_browser.scroll_to_element("//span[@class='pagination__next icon-right-arrow-thin']")
             self.press_next_page()
         self.obj_browser.driver.close()
-        return self.errors
+        self.log.write_log(self.errors)
+        self.log.write_log(f"RUNNING: {self.name_supermarket}.main() completed")
 
 if __name__== "__main__":
     obj_supermarket = Carrefour()

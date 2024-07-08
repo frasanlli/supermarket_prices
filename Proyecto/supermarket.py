@@ -1,9 +1,7 @@
-from abc import ABC, abstractmethod
 import os
-import random
 import re
-import time
-
+from abc import ABC, abstractmethod
+from log import Log
 from basket import Basket
 from browser import Browser
 from product import Product
@@ -14,6 +12,8 @@ class Supermarket(ABC):
     def __init__(self, postal_code:str = "46135")->None:
         self.obj_basket: Basket = Basket()
         self.obj_browser: Browser = Browser()
+        self.log = Log()
+        self.log.write_log(f"Supermarket {self.name_supermarket} running")
         self.postal_code=postal_code
         self.name_csv: str = f'data_csv//{self.name_supermarket}_'+self.obj_basket.today+'.csv'
         self.name_xlsx: str = f'data_xlsx//{self.name_supermarket}_'+self.obj_basket.today+'.xlsx'

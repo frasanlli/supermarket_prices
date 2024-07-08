@@ -52,7 +52,7 @@ class Consum(Supermarket):
         """Note product price/quantity"""
         try:
             point_quantity_price = product_quantity_price.replace(",",".")
-            quantity_price_num = float(re.findall("\d+\.\d+",point_quantity_price)[0])
+            quantity_price_num = float(re.findall(r"\d+\.\d+",point_quantity_price)[0])
             print("PRICE(€/quantity):"+str(quantity_price_num))
             self.obj_basket.data["price per quantity(€/quantity)"].append(quantity_price_num)
         except Exception as e:
@@ -72,7 +72,7 @@ class Consum(Supermarket):
         """Note product quantity using price per quantity and unitary price"""
         try:
             point_quantity_price = product_quantity_price.replace(",",".")
-            quantity_price_num = float(re.findall("\d+\.\d+",point_quantity_price)[0])
+            quantity_price_num = float(re.findall(r"\d+\.\d+",point_quantity_price)[0])
             unitary_price: str = unitary_price.replace(" €", "")
             unit_price_num: float = float(unitary_price.replace(",", "."))
             quantity = unit_price_num/quantity_price_num
@@ -82,7 +82,7 @@ class Consum(Supermarket):
             self.errors.append(f"ERROR CONSUM: not possible to note item's unitary quanitity\n {e}")
 
     def change_quantity_price_class(self, card_class)->None:
-        ending_value: list[str] = re.findall("\d+-\d+",card_class)
+        ending_value: list[str] = re.findall(r"\d+-\d+",card_class)
         attribute_class: str = self.attribute_quantity_class + ending_value[0]
         self.price_quantity_xpath = f"//div[@class='{attribute_class}']"
 
@@ -131,7 +131,7 @@ class Consum(Supermarket):
             else:
                 next_page=False
 
-    def main(self)->list[str]:
+    def main(self) -> None:
         self.go_supermarket(20)
         self.accept_cookies("button", "id", "onetrust-reject-all-handler")
         for url in self.url_list:
@@ -140,7 +140,8 @@ class Consum(Supermarket):
             self.obj_browser.scroll_to_element("//cmp-icon[@id='paginator-dropdown-icon-right']")
             self.press_next_page()
         self.obj_browser.driver.close()
-        return self.errors
+        self.log.write_log(self.errors)
+        self.log.write_log(f"RUNNING: {self.name_supermarket}.main() completed")
 
 if __name__== "__main__":
     obj_supermarket= Consum()
