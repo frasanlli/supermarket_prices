@@ -12,3 +12,5 @@ uml
 __pycache__
 *.pyc
 *.yaml
+credentials.json
+_data.py

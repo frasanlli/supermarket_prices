@@ -1,10 +1,13 @@
 import json
+import logging
 import random
 import time
 
 from pathlib import Path
 
-from webdriver_manager.firefox import GeckoDriverManager
+"""from webdriver_manager.core.utils import read_version_from_cmd
+from webdriver_manager.core.os_manager import PATTERN"""
+
 from selenium.webdriver.firefox.service import Service
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -13,9 +16,12 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class Browser():
     def __init__(self)->None:
+        #For some reason now it is not detecting the driver's path, so it is necessary to add it
+        DRIVER_PATH = r"C:\Program Files (x86)\Drivers\geckodriver.exe"
+        service: webdriver.FirefoxService = Service(executable_path=DRIVER_PATH)
         options: webdriver.FirefoxOptions = webdriver.FirefoxOptions()
         #options.add_argument("-headless")
-        self.driver: webdriver.Firefox = webdriver.Firefox(service=Service(GeckoDriverManager().install()),
+        self.driver: webdriver.Firefox = webdriver.Firefox(service=service,
                                                            options=options)
 
     def find_inside_element (self, webelement, xpath: str):#->WebElement:

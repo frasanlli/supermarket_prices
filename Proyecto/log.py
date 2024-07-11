@@ -12,6 +12,7 @@ class Log():
         return datetime.now().strftime("%d-%m-%Y, [%H:%M] : ")
 
     def write_log(self, text: str) -> None:
+        print(text)
         f = open(self.doc_name, "a")
         final_text: str = f"{self.get_time_now()} {text}"
         f.write(final_text+"\n")
