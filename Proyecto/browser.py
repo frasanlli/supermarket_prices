@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import random
 import time
 
@@ -293,20 +294,21 @@ class Browser():
     #https://heykush.hashnode.dev/add-cookies-in-selenium
     def load_cookies(self, file_name: str)->bool:
         wait: float = random.uniform(8, 11)
-        try:
-            with open(f'cookies//{file_name}_cookies.json', 'r') as f:
-                cookies = json.load(f) #stoting cookies
-                for cookie in cookies:
-                    #set the sameSite attribute to 'Strict' to avoid the error
-                    if 'sameSite' in cookie:
-                        cookie['sameSite'] = 'Strict'
-                    self.driver.add_cookie(cookie) #add the cookies
-            self.driver.refresh()
-            time.sleep(wait) # add wait to load the cookies
-            return True
-        except Exception as e:
-            print(f"Cookies could not be loaded \n {e}")
-            return False
+        if (os.path.exists('cookies//{file_name}_cookies.json')):
+            try:
+                with open(f'cookies//{file_name}_cookies.json', 'r') as f:
+                    cookies = json.load(f) #stoting cookies
+                    for cookie in cookies:
+                        #set the sameSite attribute to 'Strict' to avoid the error
+                        if 'sameSite' in cookie:
+                            cookie['sameSite'] = 'Strict'
+                        self.driver.add_cookie(cookie) #add the cookies
+                self.driver.refresh()
+                time.sleep(wait) # add wait to load the cookies
+                return True
+            except Exception as e:
+                print(f"Cookies could not be loaded \n {e}")
+        return False
 
     def scroll_to_element(self, xpath)->None:
         """Scrolls bar to WebElement if exists"""

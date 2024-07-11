@@ -1,6 +1,7 @@
 import os
 import re
 from abc import ABC, abstractmethod
+import time
 from log import Log
 from basket import Basket
 from browser import Browser
@@ -74,7 +75,8 @@ class Supermarket(ABC):
             try:
                 button = self.obj_browser.get_element_by_attribute(xpath_tag, xpath_attribute, xpath_att_value)
                 button.click()
-                self.obj_browser.wait_dissapear(button, 1)
+                time.sleep(3)
+                #self.obj_browser.wait_dissapear(button, 1)
                 self.obj_browser.save_cookies(self.name_supermarket)
             except Exception as e:
                 self.errors.append(f"ERROR SUPERMARKET: Button could not be clicked. \n {e}")
