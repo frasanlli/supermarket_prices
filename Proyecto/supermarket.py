@@ -133,13 +133,22 @@ class Supermarket(ABC):
 
     def get_card_names(self)-> tuple:
         "Returns cards names"
+        n: int = 0
         card_names: list[str] = list()
         card_upper_names: list[str] = list()
+        #while True:
         webelements: list = self.obj_browser.get_elements_by_xpath(self.product_name_xpath)
-        for card in webelements:
-            card_names.append(card.text.lower())
-            card_upper_names.append(card.text)
-        return card_names, card_upper_names
+        if webelements:
+            #self.obj_browser.driver.refresh()
+            #n+=1
+        #elif n==20:
+            #break
+        #else:
+            #break
+            for card in webelements:
+                card_names.append(card.text.lower())
+                card_upper_names.append(card.text)
+                return card_names, card_upper_names
 
     def check_path(self):
         paths: list[str] = ["cookies", "data_csv", "data_xlsx", "logs", "saved_data"]

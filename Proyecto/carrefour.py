@@ -86,6 +86,10 @@ class Carrefour (Supermarket):
         current_web: str = self.obj_browser.driver.current_url
         if web == current_web:
             self.obj_browser.driver.back()
+            self.obj_browser.scroll_to_element("//span[@class='c-button__loader__container']")
+            self.obj_browser.press_element("span",
+                                            "class",
+                                            "pagination__next icon-right-arrow-thin")
 
     def obtain_data(self)->None:
         products_names: list[str] = list()
@@ -95,22 +99,21 @@ class Carrefour (Supermarket):
         product_quantity_price: str = ""
         products_names, products_upper_initial = self.get_card_names()
         products_names = list(filter(self.check_product, products_names))
-
-        for e in products_upper_initial:
-            if e.lower() in products_names:
-                products_upper_names.append(e)
-
-        for product_name_card in products_names:
-            while True:
-                card = self.get_product_card(products_upper_names[products_names.index(product_name_card)])
-                if card:
-                    break
-            self.obj_basket.data["supermarket"].append(self.name_supermarket)
-            unitary_price = card.get_attribute("app_price")
-            product_quantity_price = card.get_attribute("app_price_per_unit")
-            product_quantity_price = self.note_item_st_price(product_quantity_price)
-            unitary_price = self.note_item_unitary_price(unitary_price)
-            self.note_item_quantity(product_quantity_price, unitary_price)
+        if products_names:
+            for e in products_upper_initial:
+                if e.lower() in products_names:
+                    products_upper_names.append(e)
+            for product_name_card in products_names:
+                while True:
+                    card = self.get_product_card(products_upper_names[products_names.index(product_name_card)])
+                    if card:
+                        break
+                self.obj_basket.data["supermarket"].append(self.name_supermarket)
+                unitary_price = card.get_attribute("app_price")
+                product_quantity_price = card.get_attribute("app_price_per_unit")
+                product_quantity_price = self.note_item_st_price(product_quantity_price)
+                unitary_price = self.note_item_unitary_price(unitary_price)
+                self.note_item_quantity(product_quantity_price, unitary_price)
 
     def press_next_page(self)->None:
         wait: float = 0

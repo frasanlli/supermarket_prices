@@ -17,13 +17,12 @@ class main_class():
         self.log.write_log("Program started")
         self.today_file = datetime.now().strftime("%d_%m_%y")
         self.today = datetime.now().strftime("%d/%m/%Y, %H:%M")
-        self.today_time = datetime.now().strftime("%H:%M")
         self.window_data: dict[str, list] = {
             "last execution":[],
             "last duration": [],
             "next execution": []
         }
-        self.running: bool = True
+        self.running_selenium: bool = False
 
     def create_label(self, my_frame: tk.Frame, text_value: str,
                      row_n: int, column_n: int, background: str=None)->tk.Label:
@@ -185,38 +184,39 @@ class main_class():
                 self.window_data["next execution"].append(self.label_next_consum.cget("text"))
                 df=pd.DataFrame(self.window_data)
                 df.to_json("saved_data//window_data.json")
-                self.running = False
                 #root.destroy()
                 exit()
             elif result is False:
-                self.running = False
                 #root.destroy()
                 exit()
         root.protocol("WM_DELETE_WINDOW", on_closing)
         root.mainloop()
 
     def check_current_time(self, time_wait: float)->None:
+        today_time = datetime.now().strftime("%H:%M")
         # Obtain current time HH:MM:SS
-        print(f"Current time: {self.today_time}")
+        print(f"Current time: {today_time}")
         try:
             print(f"Next...{self.label_next_mercadona.cget("text")}")
         except Exception as e:
             self.log.write_log("Program closed")
             self.log.write_log(f"MAIN: Tried to get label value, but program is not running. \n {e}")
             exit()
-        if self.today_time in self.label_next_all.cget("text"):
-            print("Run main")
-            self.main()
-        elif self.today_time in self.label_next_mercadona.cget("text"):
-            print("Run Mercadona")
-            self.mercadona_data()
-        elif self.today_time in self.label_next_carrefour.cget("text"):
-            self.carrefour_data()
-        elif self.today_time in self.label_next_consum.cget("text"):
-            print("Run Consum")
-            self.consum_data()
+        if not self.running_selenium:
+            if today_time in self.label_next_all.cget("text"):
+                print("Run main")
+                self.main()
+            elif today_time in self.label_next_mercadona.cget("text"):
+                print("Run Mercadona")
+                self.mercadona_data()
+            elif today_time in self.label_next_carrefour.cget("text"):
+                self.carrefour_data()
+            elif today_time in self.label_next_consum.cget("text"):
+                print("Run Consum")
+                self.consum_data()
         # Call function after 1000 miliseconds (60 seconds)
         time.sleep(time_wait)
+        self.check_current_time(time_wait)
 
     def open_dialog(self, option: str, label_next: tk.Label)->None:
 
@@ -272,15 +272,17 @@ class main_class():
 
     def new_thread(self, function: str)->None:
         process_thread: threading.Thread = threading.Thread(target=None)
-        if (function=="main"):
-            process_thread = threading.Thread(target=self.main, name="main")
-        elif (function=="mercadona_data"):
-            process_thread = threading.Thread(target=self.mercadona_data, name="mercadona")
-        elif (function=="consum_data"):
-            process_thread = threading.Thread(target=self.consum_data, name="consum")
-        elif (function=="carrefour_data"):
-            process_thread = threading.Thread(target=self.carrefour_data, name="carrefour")
-        process_thread.start()
+        if not self.running_selenium:
+            if (function=="main"):
+                process_thread = threading.Thread(target=self.main, name="main", daemon=True)
+            elif (function=="mercadona_data"):
+                process_thread = threading.Thread(target=self.mercadona_data, name="mercadona", daemon=True)
+            elif (function=="consum_data"):
+                process_thread = threading.Thread(target=self.consum_data, name="consum", daemon=True)
+            elif (function=="carrefour_data"):
+                process_thread = threading.Thread(target=self.carrefour_data, name="carrefour", daemon=True)
+            process_thread.start()
+            self.running_selenium = True
 
     def process_data(self, datos: list, obj_supermarket, label: tk.Label)->None:
         try:
@@ -293,6 +295,7 @@ class main_class():
             self.log.write_log(f"ERROR: {e}")
 
     def consum_data(self)->None:
+        self.running_selenium = True
         try:
             starttime = time.perf_counter()
             self.label_st_consum.config(text = "Running..")
@@ -308,8 +311,10 @@ class main_class():
         self.log.write_log("RUNNING: process_data() Consum completed")
         self.label_du_consum.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_consum.config(text = "Off")
+        self.running_selenium = False
 
     def carrefour_data(self)->None:
+        self.running_selenium = True
         try:
             starttime = time.perf_counter()
             self.label_st_carrefour.config(text = "Running..")
@@ -325,9 +330,11 @@ class main_class():
         self.log.write_log("RUNNING: process_data() Consum completed")
         self.label_du_carrefour.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_carrefour.config(text = "Off")
+        self.running_selenium = False
 
 
     def mercadona_data(self)->None:
+        self.running_selenium = True
         try:
             starttime = time.perf_counter()
             self.label_st_mercadona.config(text = "Running..")
@@ -343,6 +350,7 @@ class main_class():
         self.log.write_log("RUNNING: process_data() Consum completed")
         self.label_du_mercadona.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_mercadona.config(text = "Off")
+        self.running_selenium = False
 
     def reduce_data(self)->None:
         df_total = []
@@ -380,9 +388,9 @@ class main_class():
 
 if __name__== "__main__":
     obj_main = main_class()
-    main_thread = threading.Thread(target=obj_main.mainframe, name="wait")
+    main_thread = threading.Thread(target=obj_main.mainframe, name="wait", daemon=True)
     main_thread.start()
     time.sleep(3)
-    while obj_main.running:
-        wait_thread = threading.Thread(target=obj_main.check_current_time(60), name="wait")
-        wait_thread.start()
+    #while True:
+    wait_thread = threading.Thread(target=obj_main.check_current_time(60), name="wait", daemon=True)
+    wait_thread.start()
