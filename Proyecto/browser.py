@@ -83,7 +83,8 @@ class Browser():
     def get_elements_by_xpath (self, xpath: str)->list:
         #Returns a list of WebElements using an xpath
         try:
-            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
+            #WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
+            WebDriverWait(self.driver, 20).until(EC.visibility_of_all_elements_located((By.XPATH, xpath)))
             list_of_elements=self.driver.find_elements(By.XPATH, xpath)
             return list_of_elements
 
@@ -312,7 +313,7 @@ class Browser():
 
     def scroll_to_element(self, xpath)->None:
         """Scrolls bar to WebElement if exists"""
-        wait: float = random.uniform(1.5, 2.5)
+        wait: float = random.uniform(2.5, 3.5)
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
             element = self.driver.find_element(By.XPATH, xpath)

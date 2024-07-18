@@ -6,6 +6,7 @@ from tkinter import messagebox
 from tkinter import ttk
 from datetime import datetime, timedelta
 import pandas as pd
+from database import Database
 from log import Log
 from carrefour import Carrefour
 from mercadona import Mercadona
@@ -14,6 +15,7 @@ from consum import Consum
 class main_class():
     def __init__(self) -> None:
         self.log = Log()
+        self.obj_db: Database = Database()
         self.log.write_log("Program started")
         self.today_file = datetime.now().strftime("%d_%m_%y")
         self.today = datetime.now().strftime("%d/%m/%Y, %H:%M")
@@ -118,35 +120,84 @@ class main_class():
         read_saved_data()
 
 
-    def frame_log(self, log_frame: tk.Frame)->None:
-        log_label: tk.Label = self.create_label(log_frame, "", 0, 1)
-        log_label.grid(sticky="NSEW", rowspan=20, columnspan=10)
+    def frame_log(self, frame: tk.Frame)->None:
+        log_text = tk.Text(frame, height=10, state="disabled")
+        log_text.grid(column=1, sticky=tk.NS, rowspan=3)
 
-        log_button: tk.Button = tk.Button(master=log_frame,
+        scrollbar = ttk.Scrollbar(frame, orient='vertical', command=log_text.yview)
+        scrollbar.grid(row=0, column=2, sticky=tk.NS, rowspan=3)
+        log_text['yscrollcommand'] = scrollbar.set
+
+
+        log_button: tk.Button = tk.Button(master=frame,
                                     text='Load log',
                                     cursor= "hand2",
-                                    command= lambda: self.load_recent_log(log_label, log_date_entry.get()))
+                                    command= lambda: self.load_recent_log(log_text, log_date_entry.get()))
         log_button.grid(row=0, column=0)
 
-        log_info_label: tk.Label = self.create_label(log_frame,
+        log_info_label: tk.Label = self.create_label(frame,
                                                 "Introduce a date with format dd-mm-yyyy.\n Example: 30-10-2024",
                                                  1, 0)
-        log_date_entry = ttk.Entry(log_frame)
+        log_date_entry = ttk.Entry(frame)
         log_date_entry.grid(sticky="NSEW", column=0, row=2, padx=10, pady=10)
 
-    def load_recent_log(self, log_label: tk.Label, date: str)->None:
+    def load_recent_log(self, log_text: tk.Text, date: str)->None:
         text: str =""
+        log_text.config(state="normal")
         try:
             if date != "":
                 datetime.strptime(date, '%d-%m-%Y')
             text_log: list[str] = self.log.read_log(date)
             for text_line in text_log:
                 text+=text_line+"\n"
-            log_label.config(text = text)
+            log_text.insert('1.0', text)
+            log_text.config(state="disabled")
         except Exception as e:
             self.log.write_log(f"MAIN: Tried to load Log with no valid date format. \n {e}")
-            log_label.config(text = "Date format not valid. Try dd-mm-yyy")
+            log_text.insert('1.0',"Date format not valid. Try dd-mm-yyy")
 
+
+    def frame_db(self, frame: tk.Frame)->None:
+        db_text = tk.Text(frame, height=10)
+        db_text.grid(column=1, sticky=tk.NS, rowspan=3)
+        scrollbar = ttk.Scrollbar(frame, orient='vertical', command=db_text.yview)
+        scrollbar.grid(row=0, column=2, sticky=tk.NS, rowspan=3)
+        db_text['yscrollcommand'] = scrollbar.set
+
+        search_supermarket_ety = ttk.Entry(frame)
+        search_supermarket_ety.grid(sticky="NSEW", column=0, row=0, padx=10, pady=10)
+
+        supermarket_btn: tk.Button = tk.Button(master=frame,
+                                    text='Get supermarket product',
+                                    cursor= "hand2",
+                                    command= lambda: self.get_product(db_text, "supermarket", search_supermarket_ety.get()))
+        supermarket_btn.grid(row=1, column=0)
+
+        search_product_ety = ttk.Entry(frame)
+        search_product_ety.grid(sticky="NSEW", column=0, row=2, padx=10, pady=10)
+
+        search_product_btn: tk.Button = tk.Button(master=frame,
+                                    text='Search product',
+                                    cursor= "hand2",
+                                    command= lambda: self.get_product(db_text, "product", search_product_ety.get()))
+        search_product_btn.grid(row=3, column=0)
+
+    def get_product(self, text_box: tk.Text, key: str, value: str) -> None:
+        #Need to add a load screen
+        text_box.delete("1.0", "end")
+        text_box.config(state="normal")
+        try:
+            if value != "":
+                #Need to get number of products in db to avoid errors
+                for n in range(0, 45):
+                    product: str = self.obj_db.get_db(f"{n}", f"/{key}", value)
+                    if product:
+                        text_box.insert('1.0', f"{product}\n\n")
+                        #break
+                text_box.config(state="disabled")
+        except Exception as e:
+            self.log.write_log(f"MAIN: Tried to get value. \n {e}")
+            text_box.insert('1.0',"ERROR")
 
     def mainframe(self)->None:
         root: tk.Tk = tk.Tk(className="Ejecutador mejores precios")
@@ -157,15 +208,16 @@ class main_class():
         run_frame.pack(fill=tk.BOTH, expand=True)
         log_frame: tk.Frame = tk.Frame(master=notebook)
         log_frame.pack(fill=tk.BOTH, expand=True)
-        options_frame: tk.Frame = tk.Frame(master=notebook)
-        options_frame.pack(fill=tk.BOTH, expand=True)
+        db_frame: tk.Frame = tk.Frame(master=notebook)
+        db_frame.pack(fill=tk.BOTH, expand=True)
 
         notebook.add(run_frame, text='Execution')
         notebook.add(log_frame, text='Check logs')
-        notebook.add(options_frame, text='Options')
+        notebook.add(db_frame, text='Search in database')
 
         self.frame_run(run_frame)
         self.frame_log(log_frame)
+        self.frame_db(db_frame)
 
         def on_closing()->None:
             result = messagebox.askyesnocancel("Quit", "Do you want to save window's data?")
