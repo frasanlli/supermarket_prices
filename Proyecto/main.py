@@ -184,7 +184,7 @@ class main_class():
 
     def get_product(self, text_box: tk.Text, key: str, value: str) -> None:
         #Need to add a load screen
-        text_box.delete("1.0", "end")
+        text_box.delete('1.0', tk.END)
         text_box.config(state="normal")
         try:
             if value != "":
