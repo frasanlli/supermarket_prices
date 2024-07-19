@@ -51,6 +51,8 @@ class main_class():
         button.grid(sticky="NSEW", row=row_n, column=column_n)
         return button
 
+    def delete_text(self, text_box: tk.Text):
+        text_box.delete("1.0", "end")
 
     def frame_run(self, run_frame: tk.Frame)->None:
         top_labels_text: list[str] = ["State", "Actions", "Last execution", "Last duration",
@@ -132,7 +134,7 @@ class main_class():
         log_button: tk.Button = tk.Button(master=frame,
                                     text='Load log',
                                     cursor= "hand2",
-                                    command= lambda: self.load_recent_log(log_text, log_date_entry.get()))
+                                    command= lambda: get_log(log_date_entry.get()))
         log_button.grid(row=0, column=0)
 
         log_info_label: tk.Label = self.create_label(frame,
@@ -141,63 +143,71 @@ class main_class():
         log_date_entry = ttk.Entry(frame)
         log_date_entry.grid(sticky="NSEW", column=0, row=2, padx=10, pady=10)
 
-    def load_recent_log(self, log_text: tk.Text, date: str)->None:
-        text: str =""
-        log_text.config(state="normal")
-        try:
-            if date != "":
-                datetime.strptime(date, '%d-%m-%Y')
-            text_log: list[str] = self.log.read_log(date)
-            for text_line in text_log:
-                text+=text_line+"\n"
-            log_text.insert('1.0', text)
-            log_text.config(state="disabled")
-        except Exception as e:
-            self.log.write_log(f"MAIN: Tried to load Log with no valid date format. \n {e}")
-            log_text.insert('1.0',"Date format not valid. Try dd-mm-yyy")
-
+        def get_log(date: str)->None:
+            text: str =""
+            log_text.config(state="normal")
+            self.delete_text(log_text)
+            try:
+                if date != "":
+                    datetime.strptime(date, '%d-%m-%Y')
+                text_log: list[str] = self.log.read_log(date)
+                for text_line in text_log:
+                    text+=text_line+"\n"
+                log_text.insert('1.0', text)
+                log_text.config(state="disabled")
+            except Exception as e:
+                self.log.write_log(f"MAIN: Tried to load Log with no valid date format. \n {e}")
+                log_text.insert('1.0',"Date format not valid. Try dd-mm-yyyy")
 
     def frame_db(self, frame: tk.Frame)->None:
+        self.create_label(frame, "Supermarket:", 0, 0)
+        self.create_label(frame, "Product general:", 1, 0)
+        self.create_label(frame, "Product name:", 2, 0)
+        results: tk.Label = self.create_label(frame, "", 4, 2)
+
         db_text = tk.Text(frame, height=10)
-        db_text.grid(column=1, sticky=tk.NS, rowspan=3)
+        db_text.grid(row=0, column=2, sticky=tk.NS, rowspan=3)
         scrollbar = ttk.Scrollbar(frame, orient='vertical', command=db_text.yview)
-        scrollbar.grid(row=0, column=2, sticky=tk.NS, rowspan=3)
+        scrollbar.grid(row=0, column=3, sticky=tk.NS, rowspan=3)
         db_text['yscrollcommand'] = scrollbar.set
 
-        search_supermarket_ety = ttk.Entry(frame)
-        search_supermarket_ety.grid(sticky="NSEW", column=0, row=0, padx=10, pady=10)
+        supermarket_ety = ttk.Entry(frame)
+        supermarket_ety.grid(sticky="NSEW", column=1, row=0, padx=10, pady=10)
+        product_g_ety = ttk.Entry(frame)
+        product_g_ety.grid(sticky="NSEW", column=1, row=1, padx=10, pady=10)
+        product_n_ety = ttk.Entry(frame)
+        product_n_ety.grid(sticky="NSEW", column=1, row=2, padx=10, pady=10)
 
-        supermarket_btn: tk.Button = tk.Button(master=frame,
-                                    text='Get supermarket product',
-                                    cursor= "hand2",
-                                    command= lambda: self.get_product(db_text, "supermarket", search_supermarket_ety.get()))
-        supermarket_btn.grid(row=1, column=0)
-
-        search_product_ety = ttk.Entry(frame)
-        search_product_ety.grid(sticky="NSEW", column=0, row=2, padx=10, pady=10)
+        def get_filters():
+            search_list: list[str] = list()
+            search_list.append(supermarket_ety.get())
+            search_list.append(product_g_ety.get())
+            search_list.append(product_n_ety.get())
+            get_product(search_list)
 
         search_product_btn: tk.Button = tk.Button(master=frame,
                                     text='Search product',
                                     cursor= "hand2",
-                                    command= lambda: self.get_product(db_text, "product", search_product_ety.get()))
-        search_product_btn.grid(row=3, column=0)
+                                    command= get_filters)
+        search_product_btn.grid(row=4, column=0, columnspan=2)
 
-    def get_product(self, text_box: tk.Text, key: str, value: str) -> None:
-        #Need to add a load screen
-        text_box.delete('1.0', tk.END)
-        text_box.config(state="normal")
-        try:
-            if value != "":
+        def get_product(value_list: list[str]) -> None:
+            #Need to add a load screen
+            matches: int = 0
+            db_text.config(state="normal")
+            self.delete_text(db_text)
+            try:
                 #Need to get number of products in db to avoid errors
                 for n in range(0, 45):
-                    product: str = self.obj_db.get_db(f"{n}", f"/{key}", value)
+                    product: str = self.obj_db.get_db_filters(f"{n}", value_list)
                     if product:
-                        text_box.insert('1.0', f"{product}\n\n")
-                        #break
-                text_box.config(state="disabled")
-        except Exception as e:
-            self.log.write_log(f"MAIN: Tried to get value. \n {e}")
-            text_box.insert('1.0',"ERROR")
+                        db_text.insert('1.0', f"{product}\n\n")
+                        matches+=1
+                results.config(text=f"Matches found {matches}")
+                db_text.config(state="disabled")
+            except Exception as e:
+                self.log.write_log(f"MAIN: Tried to get value. \n {e}")
+                db_text.insert('1.0',"ERROR")
 
     def mainframe(self)->None:
         root: tk.Tk = tk.Tk(className="Ejecutador mejores precios")
