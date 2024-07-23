@@ -1,6 +1,7 @@
 import random
 import re
 import time
+import inspect
 
 from supermarket import Supermarket
 
@@ -154,8 +155,8 @@ class Carrefour (Supermarket):
             self.obj_browser.scroll_to_element("//span[@class='pagination__next icon-right-arrow-thin']")
             self.press_next_page()
         self.obj_browser.driver.close()
-        self.log.write_log(self.errors)
-        self.log.write_log(f"RUNNING: {self.name_supermarket}.main() completed")
+        self.log.write_log(self.errors, __file__, inspect.currentframe().f_lineno)
+        self.log.write_log(f"RUNNING, {self.name_supermarket}.main() completed", __file__, inspect.currentframe().f_lineno)
 
 if __name__== "__main__":
     obj_supermarket = Carrefour()

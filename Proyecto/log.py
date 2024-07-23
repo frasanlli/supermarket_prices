@@ -1,4 +1,5 @@
 from datetime import datetime
+import inspect
 import os
 
 class Log():
@@ -9,12 +10,12 @@ class Log():
             open(self.doc_name, "w")
 
     def get_time_now(self)->datetime:
-        return datetime.now().strftime("%d-%m-%Y, [%H:%M] : ")
+        return datetime.now().strftime("%d-%m-%Y, [%H:%M] ")
 
-    def write_log(self, text: str) -> None:
-        print(text)
+    def write_log(self, text: str, file_name: str, line: str) -> None:
+        print(f"{file_name}-> {text}")
         f = open(self.doc_name, "a")
-        final_text: str = f"{self.get_time_now()} {text}"
+        final_text: str = f"{self.get_time_now()}{file_name}, line [{line}]:\n {text}"
         f.write(final_text+"\n")
         f.close()
 

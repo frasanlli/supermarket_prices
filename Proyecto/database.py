@@ -1,4 +1,5 @@
 from datetime import datetime
+import inspect
 import os
 import json
 import firebase_admin
@@ -23,7 +24,7 @@ class Database():
             else:
                 return None
         except Exception as e:
-            self.log.write_log(f"DATABASE set error:\n {e}")
+            self.log.write_log(f"DATABASE set error:\n {e}", __file__, inspect.currentframe().f_lineno)
 
     def get_db_filters(self, db_ref_n: str = "/", value_list: list[str] = list()) -> str|None:
         match: str = ""
@@ -42,14 +43,14 @@ class Database():
             return match
             #return db.reference(db_ref_n).get()
         except Exception as e:
-            self.log.write_log(f"DATABASE set error:\n {e}")
+            self.log.write_log(f"DATABASE set error:\n {e}", __file__, inspect.currentframe().f_lineno)
 
     def set_db(self, tag: str, update_val: any, db_ref: str = "/") -> None:
         try:
             db.reference(db_ref).set({tag : update_val})
             #self.log.write_log(f"File set:{db.reference(db_ref).get()}")
         except Exception as e:
-            self.log.write_log(f"DATABASE set error:\n {e}")
+            self.log.write_log(f"DATABASE set error:\n {e}", __file__, inspect.currentframe().f_lineno)
 
     def update_db(self, tag: str, update_val: any, db_ref: str = "/") -> None:
         try:
@@ -57,14 +58,14 @@ class Database():
             ref.update({tag : update_val})
             #self.log.write_log(f"File updated:{db.reference(db_ref).get()}")
         except Exception as e:
-            self.log.write_log(f"DATABASE update error:\n {e}")
+            self.log.write_log(f"DATABASE update error:\n {e}", __file__, inspect.currentframe().f_lineno)
 
     def push_db(self, tag: str, update_val: any, db_ref: str = "/") -> None:
         try:
             db.reference(db_ref).push().set({tag : update_val})
             #self.log.write_log(f"File updated:{db.reference(db_ref).get()}")
         except Exception as e:
-            self.log.write_log(f"DATABASE update error:\n {e}")
+            self.log.write_log(f"DATABASE update error:\n {e}", __file__, inspect.currentframe().f_lineno)
 
     def update_csv_to_db(self, file_date: str) -> None:
         df: pd.DataFrame = pd.read_csv(os.getcwd()+f"\\data_csv\\supermarkets_{file_date}.csv")

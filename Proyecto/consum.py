@@ -1,3 +1,4 @@
+import inspect
 import re
 import time
 
@@ -140,8 +141,8 @@ class Consum(Supermarket):
             self.obj_browser.scroll_to_element("//cmp-icon[@id='paginator-dropdown-icon-right']")
             self.press_next_page()
         self.obj_browser.driver.close()
-        self.log.write_log(self.errors)
-        self.log.write_log(f"RUNNING: {self.name_supermarket}.main() completed")
+        self.log.write_log(self.errors, __file__, inspect.currentframe().f_lineno)
+        self.log.write_log(f"RUNNING: {self.name_supermarket}.main() completed", __file__, inspect.currentframe().f_lineno)
 
 if __name__== "__main__":
     obj_supermarket= Consum()

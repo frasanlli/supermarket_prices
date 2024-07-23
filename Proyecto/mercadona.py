@@ -1,3 +1,4 @@
+import inspect
 import re
 import time
 
@@ -118,8 +119,8 @@ class Mercadona (Supermarket):
         self.accept_cookies("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
         self.open_subcategory_products()
         self.obj_browser.driver.close()
-        self.log.write_log(self.errors)
-        self.log.write_log(f"RUNNING: {self.name_supermarket}.main() completed")
+        self.log.write_log(self.errors, __file__, inspect.currentframe().f_lineno)
+        self.log.write_log(f"RUNNING: {self.name_supermarket}.main() completed", __file__, inspect.currentframe().f_lineno)
 
 if __name__== "__main__":
     obj_supermarket=Mercadona()

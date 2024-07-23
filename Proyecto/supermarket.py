@@ -1,3 +1,4 @@
+import inspect
 import os
 import re
 from abc import ABC, abstractmethod
@@ -14,7 +15,7 @@ class Supermarket(ABC):
         self.obj_basket: Basket = Basket()
         self.obj_browser: Browser = Browser()
         self.log = Log()
-        self.log.write_log(f"Supermarket {self.name_supermarket} running")
+        self.log.write_log(f"Supermarket {self.name_supermarket} running", __file__, inspect.currentframe().f_lineno)
         self.postal_code=postal_code
         self.name_csv: str = f'data_csv//{self.name_supermarket}_'+self.obj_basket.today+'.csv'
         self.name_xlsx: str = f'data_xlsx//{self.name_supermarket}_'+self.obj_basket.today+'.xlsx'

@@ -1,6 +1,7 @@
 import os
 import threading
 import time
+import inspect
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
@@ -16,7 +17,7 @@ class main_class():
     def __init__(self) -> None:
         self.log = Log()
         self.obj_db: Database = Database()
-        self.log.write_log("Program started")
+        self.log.write_log("Program started", __file__, inspect.currentframe().f_lineno)
         self.today_file = datetime.now().strftime("%d_%m_%y")
         self.today = datetime.now().strftime("%d/%m/%Y, %H:%M")
         self.window_data: dict[str, list] = {
@@ -123,25 +124,27 @@ class main_class():
 
 
     def frame_log(self, frame: tk.Frame)->None:
+        row_span_val: int = 3
+        frame.grid_rowconfigure([0, 2], weight=1, minsize=10)
+        frame.grid_columnconfigure([1], weight=1, minsize=20)
         log_text = tk.Text(frame, height=10, state="disabled")
-        log_text.grid(column=1, sticky=tk.NS, rowspan=3)
+        log_text.grid(row=0, column=1, columnspan=2, sticky=tk.NSEW, rowspan=row_span_val)
 
         scrollbar = ttk.Scrollbar(frame, orient='vertical', command=log_text.yview)
-        scrollbar.grid(row=0, column=2, sticky=tk.NS, rowspan=3)
+        scrollbar.grid(row=0, column=3, sticky=tk.NS, rowspan=row_span_val)
         log_text['yscrollcommand'] = scrollbar.set
-
 
         log_button: tk.Button = tk.Button(master=frame,
                                     text='Load log',
                                     cursor= "hand2",
                                     command= lambda: get_log(log_date_entry.get()))
-        log_button.grid(row=0, column=0)
+        log_button.grid(column=0, row=0, padx=10, pady=10, sticky=tk.S)
 
-        log_info_label: tk.Label = self.create_label(frame,
-                                                "Introduce a date with format dd-mm-yyyy.\n Example: 30-10-2024",
-                                                 1, 0)
+        log_info_label: tk.Label = tk.Label(master=frame,
+                                            text="Introduce a date with format dd-mm-yyyy.\n Example: 30-10-2024")
+        log_info_label.grid(column=0, row=1, padx=10, pady=10)
         log_date_entry = ttk.Entry(frame)
-        log_date_entry.grid(sticky="NSEW", column=0, row=2, padx=10, pady=10)
+        log_date_entry.grid(column=0, row=2, padx=10, pady=10, sticky=tk.N)
 
         def get_log(date: str)->None:
             text: str =""
@@ -156,19 +159,23 @@ class main_class():
                 log_text.insert('1.0', text)
                 log_text.config(state="disabled")
             except Exception as e:
-                self.log.write_log(f"MAIN: Tried to load Log with no valid date format. \n {e}")
+                self.log.write_log(f"Tried to load Log with no valid date format. \n {e}", __file__, inspect.currentframe().f_lineno)
                 log_text.insert('1.0',"Date format not valid. Try dd-mm-yyyy")
 
     def frame_db(self, frame: tk.Frame)->None:
+        row_span_val: int = 5
+        frame.grid_rowconfigure([3], weight=1, minsize=10)
+        frame.grid_columnconfigure([2], weight=1, minsize=20)
+
         self.create_label(frame, "Supermarket:", 0, 0)
         self.create_label(frame, "Product general:", 1, 0)
         self.create_label(frame, "Product name:", 2, 0)
         results: tk.Label = self.create_label(frame, "", 4, 2)
 
         db_text = tk.Text(frame, height=10)
-        db_text.grid(row=0, column=2, sticky=tk.NS, rowspan=3)
+        db_text.grid(row=0, column=2, sticky=tk.NSEW, rowspan=row_span_val)
         scrollbar = ttk.Scrollbar(frame, orient='vertical', command=db_text.yview)
-        scrollbar.grid(row=0, column=3, sticky=tk.NS, rowspan=3)
+        scrollbar.grid(row=0, column=3, sticky=tk.NS, rowspan=row_span_val)
         db_text['yscrollcommand'] = scrollbar.set
 
         supermarket_ety = ttk.Entry(frame)
@@ -189,7 +196,7 @@ class main_class():
                                     text='Search product',
                                     cursor= "hand2",
                                     command= get_filters)
-        search_product_btn.grid(row=4, column=0, columnspan=2)
+        search_product_btn.grid(row=4, column=0, columnspan=2, pady=20)
 
         def get_product(value_list: list[str]) -> None:
             #Need to add a load screen
@@ -206,7 +213,7 @@ class main_class():
                 results.config(text=f"Matches found {matches}")
                 db_text.config(state="disabled")
             except Exception as e:
-                self.log.write_log(f"MAIN: Tried to get value. \n {e}")
+                self.log.write_log(f"Tried to get value. \n {e}", __file__, inspect.currentframe().f_lineno)
                 db_text.insert('1.0',"ERROR")
 
     def mainframe(self)->None:
@@ -261,8 +268,8 @@ class main_class():
         try:
             print(f"Next...{self.label_next_mercadona.cget("text")}")
         except Exception as e:
-            self.log.write_log("Program closed")
-            self.log.write_log(f"MAIN: Tried to get label value, but program is not running. \n {e}")
+            self.log.write_log("Program closed", __file__, inspect.currentframe().f_lineno)
+            self.log.write_log(f"Tried to get label value, but program is not running. \n {e}", __file__, inspect.currentframe().f_lineno)
             exit()
         if not self.running_selenium:
             if today_time in self.label_next_all.cget("text"):
@@ -304,10 +311,11 @@ class main_class():
 
             except ValueError:
                 label_ad.config(text = "Option not valid")
-                self.log.write_log("MAIN: Programmed execution time is not valid.")
+                self.log.write_log("Programmed execution time is not valid.", __file__, inspect.currentframe().f_lineno)
                 return False
 
         root = tk.Tk(className=f"Program execution {option}")
+        root.resizable(False, False)
 
         my_frame=tk.Frame(master=root)
         my_frame.pack()
@@ -315,9 +323,9 @@ class main_class():
                                             text="Input format hh:mm.\n Example: 10:30",
                                             padx=10,
                                             pady=10)
-        label_message.grid(sticky="NSEW", row=0,column=0, columnspan=2)
+        label_message.grid(sticky="NSEW", row=0, column=0, columnspan=2)
         entry_message: tk.Entry = tk.Entry(master=my_frame)
-        entry_message.grid(sticky="NSEW", row=1,column=0)
+        entry_message.grid(sticky="NSEW", row=1, column=0)
 
         accept: tk.Button = tk.Button(master=my_frame,
                                     text='Accept',
@@ -354,7 +362,7 @@ class main_class():
         except Exception as e:
             label.config(text = "ERROR: Check log file")
             self.label_st_carrefour.config(text = "ERROR: Check log file")
-            self.log.write_log(f"ERROR: {e}")
+            self.log.write_log(f"ERROR {e}", __file__, inspect.currentframe().f_lineno)
 
     def consum_data(self)->None:
         self.running_selenium = True
@@ -366,11 +374,11 @@ class main_class():
             obj_supermarket.main()
         except Exception as e:
             self.label_st_consum.config(text = "ERROR: Check log file")
-            self.log.write_log(f"ERROR: {e}")
+            self.log.write_log(f"ERROR: {e}", __file__, inspect.currentframe().f_lineno)
             obj_supermarket.obj_browser.driver.close()
 
         self.process_data(obj_supermarket.obj_basket.data, obj_supermarket, self.label_st_consum)
-        self.log.write_log("RUNNING: process_data() Consum completed")
+        self.log.write_log("RUNNING: process_data() Consum completed", __file__, inspect.currentframe().f_lineno)
         self.label_du_consum.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_consum.config(text = "Off")
         self.running_selenium = False
@@ -385,11 +393,11 @@ class main_class():
             obj_supermarket.main()
         except Exception as e:
             self.label_st_carrefour.config(text = "ERROR: Check log file")
-            self.log.write_log(f"ERROR: {e}")
+            self.log.write_log(f"ERROR: {e}", __file__, inspect.currentframe().f_lineno)
             obj_supermarket.obj_browser.driver.close()
 
         self.process_data(obj_supermarket.obj_basket.data, obj_supermarket, self.label_st_carrefour)
-        self.log.write_log("RUNNING: process_data() Consum completed")
+        self.log.write_log("RUNNING: process_data() Consum completed", __file__, inspect.currentframe().f_lineno)
         self.label_du_carrefour.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_carrefour.config(text = "Off")
         self.running_selenium = False
@@ -405,11 +413,11 @@ class main_class():
             obj_supermarket.main()
         except Exception as e:
             self.label_st_consum.config(text = "ERROR: Check log file")
-            self.log.write_log(f"ERROR: {e}")
+            self.log.write_log(f"ERROR: {e}", __file__, inspect.currentframe().f_lineno)
             obj_supermarket.obj_browser.driver.close()
 
         self.process_data(obj_supermarket.obj_basket.data, obj_supermarket, self.label_st_mercadona)
-        self.log.write_log("RUNNING: process_data() Consum completed")
+        self.log.write_log("RUNNING: process_data() Consum completed", __file__, inspect.currentframe().f_lineno)
         self.label_du_mercadona.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_mercadona.config(text = "Off")
         self.running_selenium = False
