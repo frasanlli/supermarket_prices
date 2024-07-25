@@ -141,7 +141,7 @@ class Supermarket(ABC):
             for card in webelements:
                 card_names.append(card.text.lower())
                 card_upper_names.append(card.text)
-                return card_names, card_upper_names
+            return card_names, card_upper_names
 
     def check_path(self):
         paths: list[str] = ["cookies", "data_csv", "data_xlsx", "logs", "saved_data"]

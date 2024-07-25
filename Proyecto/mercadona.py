@@ -87,10 +87,10 @@ class Mercadona (Supermarket):
 
     def open_subcategory_products(self) -> None:
         list_of_subcategories: list = list()
-        list_of_categories: list = self.obj_browser.get_elements_by_attribute("li", "class", "category-menu__item")
+        list_of_categories: list|None = self.obj_browser.get_elements_by_attribute("li", "class", "category-menu__item")
         for category in list_of_categories:
             category.click()
-            list_of_subcategories=self.obj_browser.get_elements_by_attribute("button", "class", "category-item__link")
+            list_of_subcategories = self.obj_browser.get_elements_by_attribute("button", "class", "category-item__link")
             for subcategory in list_of_subcategories:
                 subcategory.click()
                 self.obtain_data()

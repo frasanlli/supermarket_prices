@@ -14,6 +14,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.remote.webelement import WebElement
 
 class Browser():
     def __init__(self)->None:
@@ -25,14 +26,14 @@ class Browser():
         self.driver: webdriver.Firefox = webdriver.Firefox(service=service,
                                                            options=options)
 
-    def find_inside_element (self, webelement, xpath: str):#->WebElement:
+    def find_inside_element (self, webelement, xpath: str) -> WebElement|None:
         #Returns WebElement's son
         #WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(webelement.find_element(By.XPATH, xpath)))
-        element = webelement.find_element(By.XPATH, xpath)
+        element: WebElement|None = webelement.find_element(By.XPATH, xpath)
         return element
 
 
-    def find_inside_element_text (self, webelement, xpath: str, text_input: str):#->WebElement:
+    def find_inside_element_text (self, webelement, xpath: str, text_input: str) -> WebElement|None:
         #Returns WebElement's son that contains specific text
         WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(webelement.find_element(By.XPATH, xpath)))
         elements=webelement.find_elements(By.XPATH, xpath)
@@ -55,12 +56,12 @@ class Browser():
             self.driver.quit()
 
     #Obtener lista empleando contenido que muestra como texto
-    def get_elements_by_text (self, text_content: str)->list:
+    def get_elements_by_text (self, text_content: str)->list[WebElement]|None:
         #Returns
         xpath="//*[contains(text(),'"+text_content+"')]"
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            list_of_elements=self.driver.find_elements(By.XPATH, xpath)
+            list_of_elements: list[WebElement]|None = self.driver.find_elements(By.XPATH, xpath)
             return list_of_elements
 
         except Exception as e:
@@ -68,11 +69,11 @@ class Browser():
             print("ERROR: element not found by its text")
             #self.driver.quit()
 
-    def get_element_by_xpath (self, xpath: str):#-> WebElement or None
+    def get_element_by_xpath (self, xpath: str)-> WebElement|None:
         #Returns first WebElement found by its xpath
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            element=self.driver.find_element(By.XPATH, xpath)
+            element: WebElement|None = self.driver.find_element(By.XPATH, xpath)
             return element
 
         except Exception as e:
@@ -80,12 +81,12 @@ class Browser():
             print("ERROR: elements not found")
             #self.driver.quit()
 
-    def get_elements_by_xpath (self, xpath: str)->list:
+    def get_elements_by_xpath (self, xpath: str)->list[WebElement]|None:
         #Returns a list of WebElements using an xpath
         try:
             #WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
             WebDriverWait(self.driver, 20).until(EC.visibility_of_all_elements_located((By.XPATH, xpath)))
-            list_of_elements=self.driver.find_elements(By.XPATH, xpath)
+            list_of_elements: list[WebElement]|None = self.driver.find_elements(By.XPATH, xpath)
             return list_of_elements
 
         except Exception as e:
@@ -97,7 +98,7 @@ class Browser():
         #Returns first WebElement text content found using its xpath
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            element=self.driver.find_element(By.XPATH, xpath)
+            element: WebElement|None = self.driver.find_element(By.XPATH, xpath)
             return element.text()
 
         except Exception as e:
@@ -111,19 +112,19 @@ class Browser():
             xpath=f"//*[contains(text(),'{text}')]"
             try:
                 WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-                element=self.driver.find_element(By.XPATH, xpath)
+                element: WebElement|None = self.driver.find_element(By.XPATH, xpath)
                 if element:
                     return True
             except Exception as e:
                 pass
         return False
 
-    def get_one_element_by_text (self, text_content: str):#->WebElement:
+    def get_one_element_by_text (self, text_content: str) -> WebElement|None :
         #Returns first WebElement found using its text content
         xpath=f"//*[contains(text(),'{text_content}')]"
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            element=self.driver.find_element(By.XPATH, xpath)
+            element: WebElement|None =self.driver.find_element(By.XPATH, xpath)
             return element
 
         except Exception as e:
@@ -131,14 +132,17 @@ class Browser():
             print("ERROR: element not found by its text")
             #self.driver.quit()
 
-    def get_elements_by_attribute (self, locator_value: str, attribute: str, attribute_content: str)->list:
+    def get_elements_by_attribute (self,
+                                   locator_value: str,
+                                   attribute: str,
+                                   attribute_content: str) -> list[WebElement]|None:
         #Returns list of WebElements using attribute and attribute content
-        list_final=[]
-        xpath="//"+locator_value
+        list_final: list[WebElement]|None = []
+        xpath: str = "//"+locator_value
 
         try:
             WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            list_of_elements=self.driver.find_elements(By.XPATH, xpath)
+            list_of_elements: list[WebElement]|None = self.driver.find_elements(By.XPATH, xpath)
             for e in list_of_elements:
                 if attribute_content in e.get_attribute(attribute):
                     list_final.append(e)
@@ -151,9 +155,9 @@ class Browser():
 
     def press_element_parent(self, text_son: str)-> None:
         #Click over clickable WebElement's parent
-        go_father="//.."
+        go_father: str = "//.."
         for i in range(1, 5):
-            xpath = f'//*[contains(text(),"{text_son}")]{go_father*i}'
+            xpath: str = f'//*[contains(text(),"{text_son}")]{go_father*i}'
             try:
                 self.driver.find_element(By.XPATH, xpath).click()
                 break
@@ -161,7 +165,7 @@ class Browser():
                 print(e)
                 print("Minor Error: element not clickable, trying next")
 
-    def get_element_parent(self, text_son: str, ancestor_n: int, tag: str = "*"):#-> WebElement
+    def get_element_parent(self, text_son: str, ancestor_n: int, tag: str = "*")-> WebElement|None:
         #Returns WebElement's ancestor
         go_father: str = "//.."*ancestor_n
         xpath: str = f'//{tag}[contains(text(),"{text_son}")]{go_father}'
@@ -172,7 +176,7 @@ class Browser():
             print(e)
             print("Minor Error: element not clickable, trying next")
 
-    def get_card_carrefour(self, xpath_parent: str, text_son: str):#-> WebElement/None
+    def get_card_carrefour(self, xpath_parent: str, text_son: str)-> WebElement|None:
         #Returns WebElement's ancestor limited to 22 characters (text_son)
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath_parent)))
@@ -185,14 +189,13 @@ class Browser():
             print(e)
             print("Minor Error: element not clickable, trying next")
 
-    def get_element_by_attribute (self, locator_value: str, attribute: str, attribute_content: str): #-> WebElement
+    def get_element_by_attribute (self, locator_value: str, attribute: str, attribute_content: str)-> WebElement|None:
         #Returns first WebElement found using tag+attribute+attribute_value
         xpath="//"+locator_value+"[@"+attribute+"='"+attribute_content+"']"
 
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            element=self.driver.find_element(By.XPATH, xpath)
-
+            element: WebElement|None =self.driver.find_element(By.XPATH, xpath)
             return element
 
         except Exception as e:
@@ -200,11 +203,10 @@ class Browser():
             print("ERROR: element not found by its attribute")
 
     def click_script_preciokilo(self, tag: str, attribute: str, attribute_content: str)->None:
-        xpath=f"//{tag}[@{attribute}='{attribute_content}']"
-        wait: float = random.uniform(1, 2)
+        xpath: str = f"//{tag}[@{attribute}='{attribute_content}']"
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            button = self.get_one_element_by_text("Precio por kilo")
+            button: WebElement|None = self.get_one_element_by_text("Precio por kilo")
             self.driver.execute_script("arguments[0].click();", button)
             self.driver.implicitly_wait(1.5)
         except Exception as e:
@@ -213,12 +215,12 @@ class Browser():
 
     def click_script(self, tag: str, attribute: str, attribute_content: str)->None:
         #Clicks webelement using javascript
-        xpath=f"//{tag}[@{attribute}='{attribute_content}']"
+        xpath: str = f"//{tag}[@{attribute}='{attribute_content}']"
         if (attribute==""):
             xpath=f"//{tag}"
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            button = self.driver.find_element(By.XPATH, xpath)
+            button: WebElement|None = self.driver.find_element(By.XPATH, xpath)
             self.driver.execute_script("arguments[0].click();", button)
         except Exception as e:
             print(e)
@@ -226,10 +228,10 @@ class Browser():
 
     def press_button (self, attribute: str, attribute_content: str)->None:
         #Press button tag
-        xpath="//button[@"+attribute+"='"+attribute_content+"']"
+        xpath: str = "//button[@"+attribute+"='"+attribute_content+"']"
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            button=self.driver.find_element(By.XPATH, xpath)
+            button: WebElement|None = self.driver.find_element(By.XPATH, xpath)
             button.click()
         except Exception as e:
             print(e)
@@ -237,10 +239,10 @@ class Browser():
 
     def press_element (self, element: str, attribute: str, attribute_content: str)->bool:
         #Click first WebElement found using tag+attribute+attribute_value
-        xpath=f"//{element}[@{attribute}='{attribute_content}']"
+        xpath: str = f"//{element}[@{attribute}='{attribute_content}']"
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            button=self.driver.find_element(By.XPATH, xpath)
+            button: WebElement|None = self.driver.find_element(By.XPATH, xpath)
             button.click()
             return True
         except Exception as e:
@@ -250,10 +252,10 @@ class Browser():
 
     def press_href(self, link_value: str)->None:
         #Click link contained in a href attribute
-        xpath="//a[@href='"+link_value+"']"
+        xpath: str = "//a[@href='"+link_value+"']"
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            link= self.driver.find_element(By.XPATH, xpath)
+            link: WebElement|None= self.driver.find_element(By.XPATH, xpath)
             link.click()
         except Exception as e:
             print(e)
@@ -261,28 +263,27 @@ class Browser():
 
     def fill_input (self, attribute: str, attribute_value: str, input_text: str)->None:
         #Introduce data in an input tag
-        xpath="//input[@"+attribute+"='"+attribute_value+"']"
+        xpath: str = "//input[@"+attribute+"='"+attribute_value+"']"
         WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
         try:
-            input_element= self.driver.find_element(By.XPATH, xpath)
+            input_element: WebElement|None = self.driver.find_element(By.XPATH, xpath)
             input_element.clear()
             input_element.send_keys(input_text)
         except Exception as e:
             print(e)
             print ("ERROR: search element not found")
 
-    def wait_dissapear(self, element_web, wait_time: int)->None:
+    def wait_dissapear(self, element_web: WebElement|None, wait_time: int)->None:
         #Wait WebElement to dissapear
         n: int = 0
         while True or n<5:
             try:
                 WebDriverWait(self.driver, wait_time).until_not(EC.element_to_be_clickable(element_web))
                 break
-            except:
+            finally:
                 n+=1
-                pass
 
-    def save_cookies(self, file_name: str)->None:
+    def save_cookies(self, file_name: str) -> None:
         path_value: Path = Path(f'cookies//{file_name}_cookies.json')
         try:
             path_value.write_text(
@@ -293,7 +294,7 @@ class Browser():
             pass
 
     #https://heykush.hashnode.dev/add-cookies-in-selenium
-    def load_cookies(self, file_name: str)->bool:
+    def load_cookies(self, file_name: str) -> bool:
         wait: float = random.uniform(8, 11)
         if (os.path.exists('cookies//{file_name}_cookies.json')):
             try:
@@ -316,7 +317,7 @@ class Browser():
         wait: float = random.uniform(2.5, 3.5)
         try:
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            element = self.driver.find_element(By.XPATH, xpath)
+            element: WebElement|None = self.driver.find_element(By.XPATH, xpath)
             self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
             time.sleep(wait)
         except Exception as e:
