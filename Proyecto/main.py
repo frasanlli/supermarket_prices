@@ -369,7 +369,6 @@ class main_class():
             df.to_excel(obj_supermarket.name_xlsx)
         except Exception as e:
             label.config(text = "ERROR: Check log file")
-            self.label_st_carrefour.config(text = "ERROR: Check log file")
             self.log.write_log(f"ERROR {e}", __file__, inspect.currentframe().f_lineno)
 
     def consum_data(self)->None:
@@ -420,7 +419,7 @@ class main_class():
             obj_supermarket=Mercadona()
             obj_supermarket.main()
         except Exception as e:
-            self.label_st_consum.config(text = "ERROR: Check log file")
+            self.label_st_mercadona.config(text = "ERROR: Check log file")
             self.log.write_log(f"ERROR: {e}", __file__, inspect.currentframe().f_lineno)
             obj_supermarket.obj_browser.driver.close()
 
