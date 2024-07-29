@@ -3,6 +3,7 @@
 This program allows to get the prices and other relevant information about products scrapping them from supermarket websites.
 
 To try by your own you will need to add your on database introducing your own credentials and html direction in database.py class:
+
     credentials.Certificate = credentials.Certificate(os.getcwd()+"\\{json_credentials_file}")
     firebase_admin.initialize_app(self.cred, {"databaseURL": {database_http_direction}})
 
