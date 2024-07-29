@@ -19,6 +19,7 @@ This tab allows the user to start scrapping pressing Run or program the executio
 
 Log tab
 This tab allows the user to see log files searching them by date.
+
 Note: Window is resizable.
 
 ![alt text](image-1.png)
@@ -26,7 +27,8 @@ Note: Window is resizable.
 Database tab
 
 This tab allows the user to search scrapped products on the database.
-More searching tools will be implemented on next's version
+More searching options will be implemented on next's version.
+
 Note: Window is resizable.
 
 ![alt text](image-2.png)
