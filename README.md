@@ -11,18 +11,23 @@ New tab will be added to allow this functionality for a non skilled user on next
 
 ---INTERFACE---
 
->Execution tab
+Execution tab
+
 This tab allows the user to start scrapping pressing Run or program the execution of a scrapping process.
+
 ![alt text](image.png)
 
->Log tab
+Log tab
 This tab allows the user to see log files searching them by date.
 Note: Window is resizable.
+
 ![alt text](image-1.png)
 
->Database tab
+Database tab
+
 This tab allows the user to search scrapped products on the database.
 More searching tools will be implemented on next's version
 Note: Window is resizable.
+
 ![alt text](image-2.png)
 
