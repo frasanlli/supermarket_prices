@@ -4,7 +4,6 @@ data_xlsx
 logs
 saved_data
 uml
-*.png
 *.json
 *.txt
 *.xlsx
