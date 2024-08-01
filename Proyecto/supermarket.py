@@ -152,7 +152,8 @@ class Supermarket(ABC):
                 print("Created")
 
     def check_web_error(self, url: str)->None:
-        web_error: list[str] = ["Hemos tenido un error", "Service Unavailable"]
+        web_error: list[str] = ["Hemos tenido un error", "Service Unavailable",
+                                "Todos los caminos llevan a Carrefour", "trabajando para solucionarlo"]
         check: bool = self.obj_browser.check_web_error(web_error)
         if check:
             self.obj_browser.driver.refresh()

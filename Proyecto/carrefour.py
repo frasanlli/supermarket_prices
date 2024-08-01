@@ -82,15 +82,24 @@ class Carrefour (Supermarket):
         except Exception as e:
             self.errors.append(f"ERROR CARREFOUR: not possible to note item's unitary price \n {e}")
 
-    def check_current_page(self)->None:
+    def check_current_page(self, used_url: str)->None:
         web: str = "https://www.carrefour.es/supermercado"
         current_web: str = self.obj_browser.driver.current_url
         if web == current_web:
             self.obj_browser.driver.back()
             self.obj_browser.scroll_to_element("//span[@class='c-button__loader__container']")
+            self.obj_browser.scroll_to_element("//span[@class='c-button__loader__container']")
             self.obj_browser.press_element("span",
                                             "class",
                                             "pagination__next icon-right-arrow-thin")
+            current_web = self.obj_browser.driver.current_url
+
+        if current_web == used_url:
+            text_url: list[str] = used_url.split("category&offset=")
+            page_num: int = int(re.findall(r"\d+",used_url)[-1]) + 24
+            self.obj_browser.go_page(text_url[0]+ "category&offset=" + str(page_num),
+                                    self.name_supermarket)
+        print(current_web)
 
     def obtain_data(self)->None:
         products_names: list[str] = list()
@@ -116,7 +125,7 @@ class Carrefour (Supermarket):
                 unitary_price = self.note_item_unitary_price(unitary_price)
                 self.note_item_quantity(product_quantity_price, unitary_price)
 
-    def press_next_page(self)->None:
+    def press_next_page(self)->str:
         wait: float = 0
         next_page: bool = True
         while next_page:
@@ -128,19 +137,17 @@ class Carrefour (Supermarket):
             current_page: int = int(current_page_str)
             self.obtain_data()
             if current_page != last_page:
-                wait = random.uniform(2.5, 3.6)
-                for i in range(1, 3):
-                    self.obj_browser.scroll_to_element("//span[@class='c-button__loader__container']")
-                    clicked = self.obj_browser.press_element("span",
-                                                            "class",
-                                                            "pagination__next icon-right-arrow-thin")
-                    if clicked:
-                        break
-                    elif not clicked and i==3:
-                        self.errors.append("ERROR CARREFOUR: not possible to click next page button")
+                used_page: str = self.obj_browser.driver.current_url
+                self.obj_browser.scroll_to_element("//span[@class='c-button__loader__container']")
+                clicked = self.obj_browser.press_element("span",
+                                                        "class",
+                                                        "pagination__next icon-right-arrow-thin")
+                if clicked:
+                    self.check_current_page(used_page)
+                else:
+                    exit()
                 time.sleep(wait)
-                self.check_current_page()
-                time.sleep(wait)
+                self.check_web_error(used_page)
             else:
                 next_page=False
 

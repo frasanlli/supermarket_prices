@@ -6,9 +6,6 @@ import time
 
 from pathlib import Path
 
-"""from webdriver_manager.core.utils import read_version_from_cmd
-from webdriver_manager.core.os_manager import PATTERN"""
-
 from selenium.webdriver.firefox.service import Service
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -77,6 +74,7 @@ class Browser():
             return element
 
         except Exception as e:
+            self.driver.save_screenshot("Error_element.png")
             print(e)
             print("ERROR: elements not found")
             #self.driver.quit()
@@ -84,12 +82,13 @@ class Browser():
     def get_elements_by_xpath (self, xpath: str)->list[WebElement]|None:
         #Returns a list of WebElements using an xpath
         try:
-            #WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
-            WebDriverWait(self.driver, 20).until(EC.visibility_of_all_elements_located((By.XPATH, xpath)))
+            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
+            #WebDriverWait(self.driver, 20).until(EC.visibility_of_all_elements_located((By.XPATH, xpath)))
             list_of_elements: list[WebElement]|None = self.driver.find_elements(By.XPATH, xpath)
             return list_of_elements
 
         except Exception as e:
+            self.driver.save_screenshot("Error_elements.png")
             print(e)
             print("ERROR: elements not found")
             #self.driver.quit()
@@ -322,4 +321,4 @@ class Browser():
             time.sleep(wait)
         except Exception as e:
             print(e)
-            print("ERROR: button not clicked")
+            print("ERROR: element not scrolled into view")
