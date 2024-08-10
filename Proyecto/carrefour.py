@@ -99,6 +99,9 @@ class Carrefour (Supermarket):
             page_num: int = int(re.findall(r"\d+",used_url)[-1]) + 24
             self.obj_browser.go_page(text_url[0]+ "category&offset=" + str(page_num),
                                     self.name_supermarket)
+        if "la-despensa" in current_web:
+            print(current_web)
+        time.sleep(random.uniform(3, 5))
         print(current_web)
 
     def obtain_data(self)->None:

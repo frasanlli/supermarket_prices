@@ -116,7 +116,9 @@ class Mercadona (Supermarket):
     def main(self) -> None:
         self.go_supermarket(10)
         self.fill_postal_code(self.postal_code)
-        self.accept_cookies("button", "class", "ui-button ui-button--small ui-button--tertiary ui-button--positive")
+        self.accept_cookies("button",
+                            "class",
+                            "ui-button ui-button--small ui-button--tertiary ui-button--positive")
         self.open_subcategory_products()
         self.obj_browser.driver.close()
         self.log.write_log(self.errors, __file__, inspect.currentframe().f_lineno)

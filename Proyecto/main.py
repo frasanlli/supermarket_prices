@@ -170,8 +170,8 @@ class main_class():
         self.create_label(frame, "Supermarket:", 0, 0)
         self.create_label(frame, "Product's category:", 1, 0)
         self.create_label(frame, "Product's name:", 2, 0)
-        self.create_label(frame, "Product's price:", 3, 0)
-        self.create_label(frame, "Cheapest product:", 4, 0)
+        """self.create_label(frame, "Product's price:", 3, 0)
+        self.create_label(frame, "Cheapest product:", 4, 0)"""
         results: tk.Label = self.create_label(frame, "", 4, 2)
 
         db_text = tk.Text(frame, height=10)
@@ -186,18 +186,18 @@ class main_class():
         product_g_ety.grid(sticky="NSEW", column=1, row=1, padx=10, pady=10)
         product_n_ety = ttk.Entry(frame)
         product_n_ety.grid(sticky="NSEW", column=1, row=2, padx=10, pady=10)
-        product_pz_ety = ttk.Entry(frame)
+        """product_pz_ety = ttk.Entry(frame)
         product_pz_ety.grid(sticky="NSEW", column=1, row=3, padx=10, pady=10)
         product_min = ttk.Checkbutton(frame, onvalue=True, offvalue=False)
-        product_min.grid(sticky="NSEW", column=1, row=4, padx=10, pady=10)
+        product_min.grid(sticky="NSEW", column=1, row=4, padx=10, pady=10)"""
 
         def get_filters():
             search_list: list[str] = list()
             search_list.append(supermarket_ety.get())
             search_list.append(product_g_ety.get())
             search_list.append(product_n_ety.get())
-            search_list.append(product_pz_ety.get())
-            search_list.append(product_min.cget("state"))
+            """search_list.append(product_pz_ety.get())
+            search_list.append(product_min.cget("state"))"""
             get_product(search_list)
 
         search_product_btn: tk.Button = tk.Button(master=frame,

@@ -82,6 +82,8 @@ class Supermarket(ABC):
             except Exception as e:
                 self.errors.append(f"ERROR SUPERMARKET: Button could not be clicked. \n {e}")
                 self.obj_browser.driver.close()
+        else:
+            self.obj_browser.driver.refresh()
 
     def check_product(self, real_name: str)->bool:
         value: bool = False
