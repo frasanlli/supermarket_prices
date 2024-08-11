@@ -20,6 +20,7 @@ This tab allows the user to start scrapping pressing Run or program the executio
 
 
 Log tab
+
 This tab allows the user to see log files searching them by date.
 
 Note: Window is resizable.
