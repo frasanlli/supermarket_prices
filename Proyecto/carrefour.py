@@ -105,6 +105,7 @@ class Carrefour (Supermarket):
         print(current_web)
 
     def obtain_data(self)->None:
+        #test_list = self.obj_browser.add_unic_attribute("div", "class", "product-card__parent", "fake_att", 24)
         products_names: list[str] = list()
         products_upper_initial: list[str] = list()
         products_upper_names: list[str] = list()
