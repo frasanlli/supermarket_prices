@@ -343,3 +343,43 @@ class Browser():
             print(e)
             print("ERROR: adding attribute not possible")
 
+    def get_attribute(self, xpath: str, attribute: str)->list[str]:
+        """Takes attribute all elements"""
+        list_att_val: list[str] = list()
+        try:
+            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
+            elements: WebElement|None = self.driver.find_elements(By.XPATH, xpath)
+            if elements:
+                for element in elements:
+                    list_att_val.append(element.get_attribute(attribute))
+                return list_att_val
+            else:
+                print("MINOR ERROR: elements not found")
+                return elements
+        except Exception as e:
+            print(e)
+            print("ERROR: getting attribute was not possible")
+
+    def change_attribute(self, locator_value: str, attribute: str, att_val: str)->WebElement:
+        """Change attribute from one element"""
+        xpath: str = f"//{locator_value}"
+        try:
+            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.driver.find_element(By.XPATH, xpath)))
+            elements: WebElement|None = self.driver.find_elements(By.XPATH, xpath)
+            if elements:
+                num: int = random.randint
+                self.driver.execute_script("arguments[0].setAttribute('"+attribute+"', '"+str(att_val)+"');", elements[num])
+                return elements[num]
+            else:
+                print("MINOR ERROR: elements not found")
+                return elements
+        except Exception as e:
+            print(e)
+            print("ERROR: setting attribute was not possible")
+
+    def use_href_attribute(self, xpath: str, supermarket_name: str, list_postion: int)->None:
+        """Get href from one element and navigate to it"""
+        list_att_val: str = self.get_attribute(xpath, "href")
+        self.go_page(list_att_val[list_postion], supermarket_name)
+
+

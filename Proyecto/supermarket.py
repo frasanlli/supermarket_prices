@@ -87,15 +87,19 @@ class Supermarket(ABC):
 
     def check_product(self, real_name: str)->bool:
         value: bool = False
+        product_cat: str = ""
         for product in self.obj_basket.products_list:
             for key_word in product.key_words:
                 if key_word in real_name:
                     value = True
+                    product_cat = key_word
                     for avoid_word in product.avoid_words:
                         if avoid_word in real_name:
                             value = False
                             break
             if value:
+                if "mercadona" not in self.name_supermarket:
+                    self.obj_basket.data["product"].append(product_cat)
                 return value
         return value
 

@@ -38,12 +38,11 @@ class Carrefour (Supermarket):
     def fill_postal_code(self, postal_code: str)->None:
         pass
 
-    def get_product_card(self, product_name: str):#->webElement:
+    def get_product_card(self, product_name: str):#->webElement|None:
         try:
             element = self.obj_browser.get_card_carrefour(self.product_card_xpath, product_name)
             if element:
-                self.obj_basket.data["product"].append(self.get_product(product_name))
-                print(f"PRODUCT_NAME: {product_name}")
+                self.note_item_name(product_name)
             return element
         except Exception as e:
             self.errors.append(f"CARREFOUR: not possible to get product card {product_name}:\n {e}")
@@ -63,8 +62,11 @@ class Carrefour (Supermarket):
     def note_item_st_price(self, product_quantity_price: str)->str:
         """Note product price/quantity"""
         try:
-            point_quantity_price = product_quantity_price.replace(",",".")
-            quantity_price_num = float(re.findall(r"\d+\.\d+",point_quantity_price)[0])
+            if "," in product_quantity_price:
+                point_quantity_price = product_quantity_price.replace(",",".")
+                quantity_price_num = float(re.findall(r"\d+\.\d+",point_quantity_price)[0])
+            else:
+                quantity_price_num = float(re.findall(r"\d", product_quantity_price)[0])
             print("PRICE(€/quantity):"+str(quantity_price_num))
             self.obj_basket.data["price per quantity(€/quantity)"].append(quantity_price_num)
             return str(quantity_price_num)
@@ -74,8 +76,11 @@ class Carrefour (Supermarket):
     def note_item_unitary_price(self, unitary_price: str)->str:
         """Note product unitary price"""
         try:
-            point_unit_price = unitary_price.replace(",",".")
-            unit_price_num = float(re.findall(r"\d+\.\d+",point_unit_price)[0])
+            if "," in unitary_price:
+                point_unit_price = unitary_price.replace(",",".")
+                unit_price_num = float(re.findall(r"\d+\.\d+",point_unit_price)[0])
+            else:
+                unit_price_num = float(re.findall(r"\d", unitary_price)[0])
             print("unitary price(€)"+str(unit_price_num))
             self.obj_basket.data["unitary price(€)"].append(unit_price_num)
             return str(unit_price_num)
@@ -133,7 +138,6 @@ class Carrefour (Supermarket):
         wait: float = 0
         next_page: bool = True
         while next_page:
-            clicked: bool = False
             pages_text: str = self.obj_browser.get_element_by_xpath(self.page_values_xpath).text
             pages_text_list: list[str] = re.findall(r'\d+', pages_text)
             last_page: int = int(pages_text_list[1])
@@ -142,14 +146,7 @@ class Carrefour (Supermarket):
             self.obtain_data()
             if current_page != last_page:
                 used_page: str = self.obj_browser.driver.current_url
-                self.obj_browser.scroll_to_element("//span[@class='c-button__loader__container']")
-                clicked = self.obj_browser.press_element("span",
-                                                        "class",
-                                                        "pagination__next icon-right-arrow-thin")
-                if clicked:
-                    self.check_current_page(used_page)
-                else:
-                    exit()
+                self.obj_browser.use_href_attribute("//div[@class='pagination__row']//a", self.name_supermarket, -1)
                 time.sleep(wait)
                 self.check_web_error(used_page)
             else:

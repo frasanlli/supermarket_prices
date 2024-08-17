@@ -385,6 +385,7 @@ class main_class():
             obj_supermarket.obj_browser.driver.close()
 
         self.process_data(obj_supermarket.obj_basket.data, obj_supermarket, self.label_st_consum)
+        #self.obj_db.update_csv_to_db(self.today_file, obj_supermarket.name_supermarket)
         self.log.write_log("RUNNING: process_data() Consum completed", __file__, inspect.currentframe().f_lineno)
         self.label_du_consum.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_consum.config(text = "Off")
@@ -404,11 +405,11 @@ class main_class():
             obj_supermarket.obj_browser.driver.close()
 
         self.process_data(obj_supermarket.obj_basket.data, obj_supermarket, self.label_st_carrefour)
-        self.log.write_log("RUNNING: process_data() Consum completed", __file__, inspect.currentframe().f_lineno)
+        #self.obj_db.update_csv_to_db(self.today_file, obj_supermarket.name_supermarket)
+        self.log.write_log("RUNNING: process_data() Carrefour completed", __file__, inspect.currentframe().f_lineno)
         self.label_du_carrefour.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_carrefour.config(text = "Off")
         self.running_selenium = False
-
 
     def mercadona_data(self)->None:
         self.running_selenium = True
@@ -424,7 +425,8 @@ class main_class():
             obj_supermarket.obj_browser.driver.close()
 
         self.process_data(obj_supermarket.obj_basket.data, obj_supermarket, self.label_st_mercadona)
-        self.log.write_log("RUNNING: process_data() Consum completed", __file__, inspect.currentframe().f_lineno)
+        #self.obj_db.update_csv_to_db(self.today_file, obj_supermarket.name_supermarket)
+        self.log.write_log("RUNNING: process_data() Mercadona completed", __file__, inspect.currentframe().f_lineno)
         self.label_du_mercadona.config(text= (timedelta(seconds=time.perf_counter()-starttime)))
         self.label_st_mercadona.config(text = "Off")
         self.running_selenium = False
@@ -468,6 +470,5 @@ if __name__== "__main__":
     main_thread = threading.Thread(target=obj_main.mainframe, name="wait", daemon=True)
     main_thread.start()
     time.sleep(3)
-    #while True:
     wait_thread = threading.Thread(target=obj_main.check_current_time(60), name="wait", daemon=True)
     wait_thread.start()

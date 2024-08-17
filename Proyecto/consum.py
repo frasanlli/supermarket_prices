@@ -103,8 +103,7 @@ class Consum(Supermarket):
         for product_name_card in products_names:
             card = self.get_product_card(products_upper_names[products_names.index(product_name_card)])
             if card:
-                self.obj_basket.data["product"].append(self.get_product(product_name_card))
-                print(f"PRODUCT_NAME: {product_name_card}")
+                self.note_item_name(self.get_product(product_name_card))
                 self.obj_basket.data["supermarket"].append(self.name_supermarket)
                 card_class: str = card.get_attribute("class")
                 self.change_quantity_price_class(card_class)

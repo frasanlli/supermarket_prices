@@ -67,8 +67,8 @@ class Database():
         except Exception as e:
             self.log.write_log(f"DATABASE update error:\n {e}", __file__, inspect.currentframe().f_lineno)
 
-    def update_csv_to_db(self, file_date: str) -> None:
-        df: pd.DataFrame = pd.read_csv(os.getcwd()+f"\\data_csv\\supermarkets_{file_date}.csv")
+    def update_csv_to_db(self, file_date: str, file_name: str = "supermarkets") -> None:
+        df: pd.DataFrame = pd.read_csv(os.getcwd()+f"\\data_csv\\{file_name}_{file_date}.csv")
         for i in range(len(df)):
             self.update_db("name", (df.iloc[i])["name"], f"{i}")
             self.update_db("product", (df.iloc[i])["product"], f"{i}")
@@ -79,6 +79,6 @@ class Database():
             self.update_db("last update", file_date, f"{i}")
 
 if __name__== "__main__":
-    #obj_db: Database = Database()
-    #obj_db.update_csv_to_db("07_06_24")
+    obj_db: Database = Database()
+    obj_db.update_csv_to_db(obj_db.today_file)
     print("END")
